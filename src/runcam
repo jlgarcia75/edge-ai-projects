@@ -1,0 +1,2 @@
+source /opt/intel/openvino/bin/setupvars.sh -pyver 3.7
+python main_local.py -i 50 -m ./ssd_mobilenet_v2_coco_2018_03_29/frozen_inference_graph.xml -d CPU -pt 0.3
