@@ -5,45 +5,41 @@ This has been provided just to give you an idea of how to structure your model c
 from openvino.inference_engine import IENetwork, IECore
 import time
 import cv2
-import logging as log
 import sys
+import os
 
 class GazeEstimation:
     '''
     Class for the Face Detection Model.
     '''
-    def __init__(self, model_name, device, threshold, extensions=None):
-
-
-        self.model_weights=model_name+'.bin'
-        self.model_structure=model_name+'.xml'
-        self.device=device
-        self.extensions= extensions
-        self.network = None
+    def __init__(self, dev, ext=None):
+        self.model = None
         self.core = None
+        self.device=dev
+        self.extensions= ext
+        self.left_eye_input = 'left_eye_image'
+        self.right_eye_input = 'right_eye_image'
+        self.head_pose_input = 'head_pose_angles'
 
+
+    def load_model(self, dir, name):
+        '''
+        TODO: This method needs to be completed by you
+        Returns: Time to load model
+        '''
+        self.model_structure=os.path.join(dir, name+".xml")
+        self.model_weights=os.path.join(dir, name+".bin")
 
         try:
             self.model=IENetwork(self.model_structure, self.model_weights)
         except Exception as e:
             raise ValueError("Could not Initialise the network. Have you entered the correct model path? {}".format(e))
 
-        self.left_eye_input = 'left_eye_image'
-        self.right_eye_input = 'right_eye_image'
-        self.head_pose_input = 'head_pose_angles'
+
         self.eye_shape=self.model.inputs[self.left_eye_input].shape
         self.output_name=next(iter(self.model.outputs))
         self.output_shape=self.model.outputs[self.output_name].shape
 
-
-    def get_eye_input_shape(self):
-        return self.eye_shape
-
-    def load_model(self):
-        '''
-        TODO: This method needs to be completed by you
-        Returns: Time to load model
-        '''
         start_time = time.time()
         self.core = IECore()
 
@@ -71,8 +67,8 @@ class GazeEstimation:
         left_eye = landmarks[1]
         left_crop = face_image[left_eye[1]-eye_offset:left_eye[1]+eye_offset, left_eye[0]-eye_offset:left_eye[0]+eye_offset]
         right_crop = face_image[right_eye[1]-eye_offset:right_eye[1]+eye_offset, right_eye[0]-eye_offset:right_eye[0]+eye_offset]
-        left_image = self.preprocess_input(image=left_crop, shape=self.eye_shape)
-        right_image = self.preprocess_input(image=right_crop, shape=self.eye_shape)
+        left_image = self.preprocess_input(image=left_crop)
+        right_image = self.preprocess_input(image=right_crop)
         input_duration_ms = time.time() - start_time
 
         #Run Inference
@@ -109,12 +105,12 @@ class GazeEstimation:
             sys.exit(1)
 
 
-    def preprocess_input(self, image, shape):
+    def preprocess_input(self, image):
         '''
         Before feeding the data into the model for inference,
         you might have to preprocess it. This function is where you can do that.
         '''
-        n, c, h, w = shape
+        n, c, h, w = self.eye_shape
 
         new_image = cv2.resize(image, (w, h))
         new_image = new_image.transpose((2,0,1))

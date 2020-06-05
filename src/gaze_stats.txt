@@ -514,3 +514,292 @@ Average Inference Time: 0.00 ms
 *********************************************************************************
 
 
+OpenVINO Results
+
+Current date and time:
+2020-06-05 12:17:24
+Platform: win32
+Device: CPU
+Probably Threshold: 0.3
+
+Face Detection Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO_2019\openvino_models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001
+Model Load Time: 289.04 ms
+Total Inference Time: 8534.95 ms
+Average Inference Time: 14.32 ms
+
+Landmark Detection Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO_2019\openvino_models\intel\landmarks-regression-retail-0009\FP16\landmarks-regression-retail-0009
+Model Load Time: 96.97 ms
+Total Inference Time: 0.00 ms
+Average Inference Time: 0.00 ms
+
+Head Pose Estimation Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO\openvino_models\intel\head-pose-estimation-adas-0001\FP16\head-pose-estimation-adas-0001
+Model Load Time: 120.01 ms
+Total Inference Time: 0.00 ms
+Average Inference Time: 0.00 ms
+
+Gaze Estimation Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO_2019\openvino_models\intel\gaze-estimation-adas-0002\FP16\gaze-estimation-adas-0002
+Model Load Time: 215.00 ms
+Total Inference Time: 0.00 ms
+Average Inference Time: 0.00 ms
+
+*********************************************************************************
+
+
+OpenVINO Results
+
+Current date and time:
+2020-06-05 12:19:16
+Platform: win32
+Device: CPU
+Probably Threshold: 0.3
+
+Face Detection Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO_2019\openvino_models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001
+Model Load Time: 352.54 ms
+Total Inference Time: 7980.06 ms
+Average Inference Time: 13.39 ms
+
+Landmark Detection Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO_2019\openvino_models\intel\landmarks-regression-retail-0009\FP16\landmarks-regression-retail-0009
+Model Load Time: 97.96 ms
+Total Inference Time: 0.00 ms
+Average Inference Time: 0.00 ms
+
+Head Pose Estimation Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO\openvino_models\intel\head-pose-estimation-adas-0001\FP16\head-pose-estimation-adas-0001
+Model Load Time: 118.00 ms
+Total Inference Time: 0.00 ms
+Average Inference Time: 0.00 ms
+
+Gaze Estimation Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO_2019\openvino_models\intel\gaze-estimation-adas-0002\FP16\gaze-estimation-adas-0002
+Model Load Time: 161.51 ms
+Total Inference Time: 0.00 ms
+Average Inference Time: 0.00 ms
+
+*********************************************************************************
+
+
+OpenVINO Results
+
+Current date and time:
+2020-06-05 12:21:06
+Platform: win32
+Device: CPU
+Probably Threshold: 0.3
+
+Face Detection Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO_2019\openvino_models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001
+Model Load Time: 319.04 ms
+Total Inference Time: 8654.44 ms
+Average Inference Time: 14.52 ms
+
+Landmark Detection Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO_2019\openvino_models\intel\landmarks-regression-retail-0009\FP16\landmarks-regression-retail-0009
+Model Load Time: 119.96 ms
+Total Inference Time: 0.00 ms
+Average Inference Time: 0.00 ms
+
+Head Pose Estimation Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO\openvino_models\intel\head-pose-estimation-adas-0001\FP16\head-pose-estimation-adas-0001
+Model Load Time: 140.00 ms
+Total Inference Time: 0.00 ms
+Average Inference Time: 0.00 ms
+
+Gaze Estimation Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO_2019\openvino_models\intel\gaze-estimation-adas-0002\FP16\gaze-estimation-adas-0002
+Model Load Time: 170.52 ms
+Total Inference Time: 0.00 ms
+Average Inference Time: 0.00 ms
+
+*********************************************************************************
+
+
+OpenVINO Results
+
+Current date and time:
+2020-06-05 12:24:12
+Platform: win32
+Device: CPU
+Probably Threshold: 0.3
+
+Face Detection Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO_2019\openvino_models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001
+Model Load Time: 341.54 ms
+Total Inference Time: 8933.99 ms
+Average Inference Time: 14.99 ms
+
+Landmark Detection Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO_2019\openvino_models\intel\landmarks-regression-retail-0009\FP16\landmarks-regression-retail-0009
+Model Load Time: 125.99 ms
+Total Inference Time: 0.00 ms
+Average Inference Time: 0.00 ms
+
+Head Pose Estimation Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO\openvino_models\intel\head-pose-estimation-adas-0001\FP16\head-pose-estimation-adas-0001
+Model Load Time: 151.00 ms
+Total Inference Time: 0.00 ms
+Average Inference Time: 0.00 ms
+
+Gaze Estimation Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO_2019\openvino_models\intel\gaze-estimation-adas-0002\FP16\gaze-estimation-adas-0002
+Model Load Time: 163.00 ms
+Total Inference Time: 0.00 ms
+Average Inference Time: 0.00 ms
+
+*********************************************************************************
+
+
+OpenVINO Results
+
+Current date and time:
+2020-06-05 13:05:20
+Platform: win32
+Device: CPU
+Probably Threshold: 0.3
+
+Face Detection Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO_2019\openvino_models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001
+Model Load Time: 323.00 ms
+Total Inference Time: 7840.31 ms
+Average Inference Time: 13.15 ms
+
+Landmark Detection Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO_2019\openvino_models\intel\landmarks-regression-retail-0009\FP16\landmarks-regression-retail-0009
+Model Load Time: 119.01 ms
+Total Inference Time: 349.11 ms
+Average Inference Time: 0.59 ms
+
+Head Pose Estimation Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO\openvino_models\intel\head-pose-estimation-adas-0001\FP16\head-pose-estimation-adas-0001
+Model Load Time: 127.99 ms
+Total Inference Time: 876.78 ms
+Average Inference Time: 1.47 ms
+
+Gaze Estimation Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO_2019\openvino_models\intel\gaze-estimation-adas-0002\FP16\gaze-estimation-adas-0002
+Model Load Time: 171.01 ms
+Total Inference Time: 1089.74 ms
+Average Inference Time: 1.83 ms
+
+*********************************************************************************
+
+
+OpenVINO Results
+
+Current date and time:
+2020-06-05 13:30:42
+Platform: win32
+Device: CPU
+Probably Threshold: 0.3
+
+Face Detection Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO\openvino_models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001
+Model Load Time: 279.00 ms
+Total Inference Time: 192.09 ms
+Average Inference Time: 11.30 ms
+
+Landmark Detection Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO\openvino_models\intel\landmarks-regression-retail-0009\FP16\landmarks-regression-retail-0009
+Model Load Time: 98.55 ms
+Total Inference Time: 14.87 ms
+Average Inference Time: 0.87 ms
+
+Head Pose Estimation Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO\openvino_models\intel\head-pose-estimation-adas-0001\FP16\head-pose-estimation-adas-0001
+Model Load Time: 116.96 ms
+Total Inference Time: 30.89 ms
+Average Inference Time: 1.82 ms
+
+Gaze Estimation Stats
+Model: C:\Users\jlgarci2\Documents\Intel\OpenVINO_2019\openvino_models\intel\gaze-estimation-adas-0002\FP16\gaze-estimation-adas-0002
+Model Load Time: 139.00 ms
+Total Inference Time: 29.98 ms
+Average Inference Time: 1.76 ms
+
+*********************************************************************************
+
+
+OpenVINO Results
+
+Current date and time:
+2020-06-05 14:32:35
+Platform: win32
+Device: CPU
+Probably Threshold: 0.3OpenVINO Results
+
+Current date and time:
+2020-06-05 14:33:42
+Platform: win32
+Device: CPU
+Probably Threshold: 0.3OpenVINO Results
+
+Current date and time:
+2020-06-05 14:36:25
+Platform: win32
+Device: CPU
+Probably Threshold: 0.3OpenVINO Results
+
+Current date and time:
+2020-06-05 14:37:08
+Platform: win32
+Device: CPU
+Probably Threshold: 0.3Precision: FP16Total frames: 4
+
+*********************************************************************************
+
+
+OpenVINO Results
+
+Current date and time:
+2020-06-05 14:49:56
+Platform: win32
+Device: CPU
+Probably Threshold: 0.3Precision: FP16Total frames: 11OpenVINO Results
+
+Current date and time:
+2020-06-05 15:04:03
+Platform: win32
+Device: CPU
+Probably Threshold: 0.3Precision: FP16Total frames: 5
+
+*********************************************************************************
+
+
+OpenVINO Results
+
+Current date and time:
+2020-06-05 15:07:57
+Platform: win32
+Device: CPU
+Probably Threshold: 0.3Precision: FP16Total frames: 134
+
+*********************************************************************************
+
+
+OpenVINO Results
+
+Current date and time:
+2020-06-05 16:28:01
+Platform: win32
+Device: CPU
+Probably Threshold: 0.3Precision: FP16Total frames: 418
+
+*********************************************************************************
+
+
+OpenVINO Results
+
+Current date and time:
+2020-06-05 16:42:47
+Platform: win32
+Device: CPU
+Probably Threshold: 0.3Precision: FP16Total frames: 6
+
+*********************************************************************************
+
+

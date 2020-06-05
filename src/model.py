@@ -28,15 +28,32 @@ class Model_X:
         '''
         raise NotImplementedError
 
-    def check_model(self):
-        raise NotImplementedError
+    def check_model(model, device):
+        core = IECore()
+         # Get the supported layers of the network
+        supported_layers = core.query_network(network=model, device_name=device)
 
-    def preprocess_input(self, image):
+        # Check for any unsupported layers, and let the user
+        # know if anything is missing. Exit the program, if so.
+
+        unsupported_layers = [l for l in model.layers.keys() if l not in supported_layers]
+        if len(unsupported_layers) != 0:
+            print("The following layers are not supported by the plugin for specified device {}:\n {}".format(device, ', '.join(unsupported_layers)))
+            print(f"Please try to specify {device} extensions library path in sample's command line parameters using -l or --extension command line argument.")
+            sys.exit(1)
+
+    def preprocess_input(self, image, shape):
     '''
     Before feeding the data into the model for inference,
     you might have to preprocess it. This function is where you can do that.
     '''
-        raise NotImplementedError
+        n, c, h, w = shape
+
+        new_image = cv2.resize(image, (w, h))
+        new_image = new_image.transpose((2,0,1))
+        new_image = new_image.reshape(n, c, h, w)
+
+        return new_image
 
     def preprocess_output(self, outputs):
     '''

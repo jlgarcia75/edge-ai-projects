@@ -6,21 +6,26 @@ from openvino.inference_engine import IENetwork, IECore
 import time
 import cv2
 import sys
+import os
 
 class FacialLandmarks:
     '''
     Class for the Face Detection Model.
     '''
-    def __init__(self, model_name, device, threshold=None, extensions=None):
-
-
-        self.model_weights=model_name+'.bin'
-        self.model_structure=model_name+'.xml'
-        self.device=device
-        self.extensions= extensions
-        self.network = None
+    def __init__(self, dev, ext=None):
+        self.model = None
         self.core = None
+        self.device=dev
+        self.extensions= ext
 
+
+    def load_model(self, dir, name):
+        '''
+        TODO: This method needs to be completed by you
+        Returns: Time to load model
+        '''
+        self.model_structure=os.path.join(dir, name+".xml")
+        self.model_weights=os.path.join(dir, name+".bin")
 
         try:
             self.model=IENetwork(self.model_structure, self.model_weights)
@@ -32,11 +37,6 @@ class FacialLandmarks:
         self.output_name=next(iter(self.model.outputs))
         self.output_shape=self.model.outputs[self.output_name].shape
 
-    def load_model(self):
-        '''
-        TODO: This method needs to be completed by you
-        Returns: Time to load model
-        '''
         start_time = time.time()
         self.core = IECore()
         #Check for unsupported layers
@@ -54,20 +54,13 @@ class FacialLandmarks:
         TODO: This method needs to be completed by you
         Returns: Duration of inference time, new image with detections
         '''
-        #Preprocess the input
-        start_time = time.time()
-        new_image = self.preprocess_input(image, self.input_shape)
-        input_duration_ms = time.time() - start_time
         #Run Inference
-        start_time = time.time()
-        self.exec_net.infer({self.input_name:new_image})
-        infer_duration_ms = time.time() - start_time
+        self.exec_net.start_async(request_id=0,inputs={self.input_name:image})
+        return
 
-        start_time = time.time()
-        detections = self.exec_net.requests[0].outputs[self.output_name]
-        output_duration_ms = time.time() - start_time
-
-        return input_duration_ms, infer_duration_ms, output_duration_ms, detections
+    def wait(self):
+        ### Wait for the request to be complete. ###
+        return self.exec_net.requests[0].wait()
 
     def check_model(self):
         '''
@@ -91,15 +84,19 @@ class FacialLandmarks:
             sys.exit(1)
 
 
-    def preprocess_input(self, image, shape):
+    def preprocess_input(self, image):
         '''
         Before feeding the data into the model for inference,
         you might have to preprocess it. This function is where you can do that.
         '''
-        n, c, h, w = shape
+        n, c, h, w = self.input_shape
 
         new_image = cv2.resize(image, (w, h))
         new_image = new_image.transpose((2,0,1))
         new_image = new_image.reshape(n, c, h, w)
 
         return new_image
+
+    def preprocess_output(self):
+    #Get the outputs
+        return self.exec_net.requests[0].outputs[self.output_name]

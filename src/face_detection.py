@@ -6,36 +6,36 @@ from openvino.inference_engine import IENetwork, IECore
 import time
 import cv2
 import sys
+import os
 
 class FaceDetection:
     '''
     Class for the Face Detection Model.
     '''
-    def __init__(self, model_name, device, threshold, extensions=None):
-
-        self.model_weights=model_name+'.bin'
-        self.model_structure=model_name+'.xml'
-        self.device=device
-        self.extensions= extensions
-        self.network = None
+    def __init__(self, dev, ext=None):
+        self.model = None
         self.core = None
+        self.device = dev
+        self.extensions= ext
 
+
+    def load_model(self, dir, name):
+        '''
+        TODO: This method needs to be completed by you
+        Returns: Time to load model
+        '''
+        self.model_structure=os.path.join(dir, name+".xml")
+        self.model_weights=os.path.join(dir, name+".bin")
 
         try:
             self.model=IENetwork(self.model_structure, self.model_weights)
         except Exception as e:
-            raise ValueError("Could not initialize the network. Have you entered the correct model path? {}".format(e))
+            raise ValueError("Could not Initialise the network. Have you entered the correct model path? {}".format(e))
 
         self.input_name=next(iter(self.model.inputs))
         self.input_shape=self.model.inputs[self.input_name].shape
         self.output_name=next(iter(self.model.outputs))
         self.output_shape=self.model.outputs[self.output_name].shape
-
-    def load_model(self):
-        '''
-        TODO: This method needs to be completed by you
-        Returns: Time to load model
-        '''
 
         start_time = time.time()
         self.core = IECore()
@@ -56,22 +56,11 @@ class FaceDetection:
         TODO: This method needs to be completed by you
         Returns: Duration of inference time, new image with detections
         '''
-        #Preprocess the input
-        start_time = time.time()
-        new_image = self.preprocess_input(image, self.input_shape)
-        input_time_ms = time.time() - start_time
-
         #Run Inference
-        start_time = time.time()
-        self.exec_net.infer({self.input_name:new_image})
-        infer_duration_ms = time.time() - start_time
+        self.exec_net.infer({self.input_name:image})
+        return
 
-        #Get the outputs
-        start_time = time.time()
-        coords = self.preprocess_output(outputs=self.exec_net.requests[0].outputs[self.output_name], threshold = conf_threshold)
-        output_time_ms = time.time() - start_time
 
-        return input_time_ms, infer_duration_ms, output_time_ms, coords
 
     def check_model(self):
         '''
@@ -82,8 +71,9 @@ class FaceDetection:
         None.
 
         '''
+        core = IECore()
          # Get the supported layers of the network
-        supported_layers = self.core.query_network(network=self.model, device_name=self.device)
+        supported_layers = core.query_network(network=self.model, device_name=self.device)
 
         # Check for any unsupported layers, and let the user
         # know if anything is missing. Exit the program, if so.
@@ -91,16 +81,16 @@ class FaceDetection:
         unsupported_layers = [l for l in self.model.layers.keys() if l not in supported_layers]
         if len(unsupported_layers) != 0:
             print("The following layers are not supported by the plugin for specified device {}:\n {}".format(self.device, ', '.join(unsupported_layers)))
-            print(f"Please try to specify {self.device} extensions library path in sample's command line parameters using -l or --extension command line argument")
+            print(f"Please try to specify {self.device} extensions library path in sample's command line parameters using -l or --extension command line argument.")
             sys.exit(1)
 
 
-    def preprocess_input(self, image, shape):
+    def preprocess_input(self, image):
         '''
         Before feeding the data into the model for inference,
         you might have to preprocess it. This function is where you can do that.
         '''
-        n, c, h, w = shape
+        n, c, h, w = self.input_shape
 
         new_image = cv2.resize(image, (w, h))
         new_image = new_image.transpose((2,0,1))
@@ -108,15 +98,17 @@ class FaceDetection:
 
         return new_image
 
-    def preprocess_output(self, outputs, threshold=None):
+    def preprocess_output(self, threshold=0.3):
         '''
         TODO: This method needs to be completed by you
         Creates array of box coordinates from outputs
 
         '''
+        #Get the outputs
+        outputs = self.exec_net.requests[0].outputs[self.output_name]
         coords = []
         for box in outputs[0][0]:
-            image_id, label, conf, x_min, y_min, x_max, y_max = box
+            _, _, conf, x_min, y_min, x_max, y_max = box
             if conf >= float(threshold):
                 coords.append([x_min, y_min, x_max, y_max])
 
