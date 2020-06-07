@@ -48,7 +48,6 @@ else:
     print("Unsupported OS.")
     exit(1)
 
-
 def build_argparser():
     """
     Parse command line arguments.
@@ -56,37 +55,56 @@ def build_argparser():
     :return: command line arguments
     """
     parser = ArgumentParser()
-    parser.add_argument("-fdm", "--fd_model", required=True, type=str,
-                        help="Path to an xml file with a trained Face Detection model.")
-    parser.add_argument("-flm", "--fl_model", required=True, type=str,
-                        help="Path to an xml file with a trained Facial Landmark model.")
-    parser.add_argument("-hpm", "--hp_model", required=True, type=str,
-                        help="Path to an xml file with a trained Head Pose model.")
-    parser.add_argument("-gem", "--ge_model", required=True, type=str,
-                        help="Path to an xml file with a trained Gaze Detection model.")
     parser.add_argument("-i", "--input", required=True, type=str,
-                        help="Path to image or video file")
+                        help="Path to input image or video file. 0 for webcam.")
+    parser.add_argument("-p", "--precisions", required=False, type=str, default='FP16',
+                                        help="Set model precisions as a comma-separated list without spaces"
+                                           ", e.g. FP32,FP16,FP32-INT8 (FP16 by default)")
+    parser.add_argument("-fdm", "--fd_model", required=False, type=str,
+                        help="Path to directory for a trained Face Detection model."
+                        "This directory path must include the model's precision because"
+                        "face-detection-adas-binary-0001 has only one precision, FP32-INT1."
+                        "(../models/intel/face-detection-adas-binary-0001/FP32-INT1/face-detection-adas-binary-0001"
+                        " by default)",
+                        default="../models/intel/face-detection-adas-binary-0001/FP32-INT1/face-detection-adas-binary-0001")
+    parser.add_argument("-flm", "--fl_model", required=False, type=str,
+                        help="Path to directory for a trained Facial Landmarks model."
+                        "The directory must have the model precisions as subdirectories."
+                        "../models/intel/landmarks-regression-retail-0009 by default)",
+                        default="../models/intel/landmarks-regression-retail-0009")
+    parser.add_argument("-hpm", "--hp_model", required=False, type=str,
+                        help="Path to directory for a trained Head Pose model."
+                        "The directory must have the model precisions as subdirectories."
+                        "(../models/intel/head-pose-estimation-adas-0001 by default)",
+                        default="../models/intel/head-pose-estimation-adas-0001")
+    parser.add_argument("-gem", "--ge_model", required=False, type=str,
+                        help="Path to directory for a trained Gaze Detection model."
+                        "The directory must have the model precisions as subdirectories."
+                        "(../models/intel/gaze-estimation-adas-0002 by default)",
+                        default="../models/intel/gaze-estimation-adas-0002")
     parser.add_argument("-l", "--cpu_extension", required=False, type=str,
                         default=None,
                         help="MKLDNN (CPU)-targeted custom layers."
                              "Absolute path to a shared library with the"
                              "kernels impl.")
-    parser.add_argument("-d", "--device", type=str, default="CPU",
+    parser.add_argument("-d", "--device", type=str, required=False, default="CPU",
                         help="Specify the target device to infer on: "
-                             "CPU, GPU, FPGA or MYRIAD is acceptable. Sample "
-                             "will look for a suitable plugin for device "
+                             "CPU, GPU, FPGA or MYRIAD is acceptable. The program "
+                             "will look for a suitable plugin for the device "
                              "specified (CPU by default)")
-    parser.add_argument("-pt", "--prob_threshold", type=float, default=0.3,
+    parser.add_argument("-pt", "--prob_threshold", type=float, default=0.3, required=False,
                         help="Probability threshold for detections filtering"
-                        "(0.3 by default)")
+                        " (0.3 by default)")
     parser.add_argument("-bm", "--benchmark", required=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'],
-                    default=False, help="See benchmark data True|False.")
-    parser.add_argument("-p", "--precisions", required=False, type=str, default='FP16',
-                    help="Set model precisions.")
-    parser.add_argument("-nf", "--num_frames", required=False, type=int, default=600,
-                    help="Short duration run.")
+                    default=True, help="Show benchmark data? True|False (True by default)")
+    parser.add_argument("-nf", "--num_frames", required=False, type=int, default=100,
+                    help="The number of frames to run. Use this to limit running time, "
+                    "especially if using webcam. (100 by default)")
     parser.add_argument("-sv", "--showvideo", required=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'],
-                    default=True, help="Show video while running. Default=True")
+                    default=True, help="Show video while running? True|False. (True by default)")
+    parser.add_argument("-async","--asyncinfer", required=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'],
+                    default=True,
+                    help="Run asynchronouse inference landmarks and head pose models? True|False. (True by default)")
 
     return parser
 
