@@ -45,7 +45,7 @@ class FaceDetection:
         duration_ms = time.time() - start_time
         # Add an extension, if applicable
         if self.extensions:
-            self.plugin.add_extension(self.extensions, self.device)
+            self.core.add_extension(self.extensions, self.device)
 
 
 

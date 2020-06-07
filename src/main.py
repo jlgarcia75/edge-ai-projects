@@ -1,4 +1,4 @@
-"""People Counter."""
+"""Move Mouse Pointer."""
 """
  Copyright (c) 2018 Intel Corporation.
  Permission is hereby granted, free of charge, to any person obtaining
@@ -20,8 +20,7 @@
 """
 import cv2
 import pandas as pd
-import re
-import sys
+import numpy as np
 from sys import exit
 from datetime import datetime
 from time import time
@@ -34,6 +33,8 @@ from MediaReader import MediaReader
 from signal import SIGINT, signal
 from argparse import ArgumentParser
 from sys import platform
+#from matplotlib import pyplot as pl
+import os
 
 
 # Get correct CPU extension
@@ -66,7 +67,7 @@ def build_argparser():
     parser.add_argument("-i", "--input", required=True, type=str,
                         help="Path to image or video file")
     parser.add_argument("-l", "--cpu_extension", required=False, type=str,
-                        default=CPU_EXTENSION,
+                        default=None,
                         help="MKLDNN (CPU)-targeted custom layers."
                              "Absolute path to a shared library with the"
                              "kernels impl.")
@@ -78,12 +79,14 @@ def build_argparser():
     parser.add_argument("-pt", "--prob_threshold", type=float, default=0.3,
                         help="Probability threshold for detections filtering"
                         "(0.3 by default)")
-    parser.add_argument("-bm", "--benchmark", required=False, type=bool, default=False,
-                    help="See benchmark data True|False.")
-    parser.add_argument("-fancy", "--fancy", required=False, type=bool, default=False,
-                    help="See benchmark data in a fancy report.")
+    parser.add_argument("-bm", "--benchmark", required=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'],
+                    default=False, help="See benchmark data True|False.")
     parser.add_argument("-p", "--precisions", required=False, type=str, default='FP16',
                     help="Set model precisions.")
+    parser.add_argument("-nf", "--num_frames", required=False, type=int, default=600,
+                    help="Short duration run.")
+    parser.add_argument("-sv", "--showvideo", required=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'],
+                    default=True, help="Show video while running. Default=True")
 
     return parser
 
@@ -127,25 +130,39 @@ def process_model_names(name):
         return dir, new_name
 
 def infer_on_stream(args):
-
     """
     Initialize the inference network, stream video to network,
     and output stats and video.
 
     """
     try:
+        ######### Setup fonts for text on image ########################
 
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        org = (10,40)
+        fontScale = .5
+        # Blue color in BGR
+        color = (255, 0, 0)
+        # Line thickness of 1 px
+        thickness = 1
+        text = ""
+        #######################################
         precisions=args.precisions.split(",")
+
+        if args.benchmark:
+            columns=['load model','input prep','predict','fetch output']
+            model_indeces=['facial detection', 'landmark detection', 'head pose', 'gaze estimation']
+            iterables = [model_indeces,precisions]
+            index = pd.MultiIndex.from_product(iterables, names=['Model','Precision'])
+            total_df = pd.DataFrame(index=index, columns=columns)
 
         fd_infer_duration_ms  = 0
         fd_input_duration_ms  = 0
         fd_output_duration_ms  = 0
 
-        fl_infer_duration_ms  = 0
         fl_input_duration_ms = 0
         fl_output_duration_ms = 0
 
-        hp_infer_duration_ms  = 0
         hp_input_duration_ms = 0
         hp_output_duration_ms = 0
 
@@ -153,13 +170,12 @@ def infer_on_stream(args):
         ge_input_duration_ms = 0
         ge_output_duration_ms = 0
 
-        frame_count=0
 
 
         fd_dir, fd_model = process_model_names(args.fd_model)
-        fl_dir, fl_model = process_model_names(args.fl_model)
-        hp_dir, hp_model = process_model_names(args.hp_model)
-        ge_dir, ge_model = process_model_names(args.ge_model)
+        _, fl_model = process_model_names(args.fl_model)
+        _, hp_model = process_model_names(args.hp_model)
+        _, ge_model = process_model_names(args.ge_model)
 
 
          # Initialise the classes
@@ -167,15 +183,6 @@ def infer_on_stream(args):
         fl_infer_network = FacialLandmarks(dev=args.device, ext=args.cpu_extension)
         hp_infer_network = HeadPose(dev=args.device, ext=args.cpu_extension)
         ge_infer_network = GazeEstimation(dev=args.device, ext=args.cpu_extension)
-
-
-        ### TODO: Load the models through `infer_network` ###
-        fd_load_duration_ms = fd_infer_network.load_model(dir=fd_dir, name=fd_model)
-        fl_load_duration_ms = fl_infer_network.load_model(dir=fl_dir, name=fl_model)
-        hp_load_duration_ms = hp_infer_network.load_model(dir=hp_dir, name=hp_model)
-        ge_load_duration_ms = ge_infer_network.load_model(dir=ge_dir, name=ge_model)
-
-        #Get gaze input description
 
         flip=False
 
@@ -188,203 +195,196 @@ def infer_on_stream(args):
 
         mc = MouseController('high', 'fast')
         screenWidth, screenHeight = mc.monitor()
-        cv2.startWindowThread()
-        cv2.namedWindow("Out")
-        cv2.moveWindow("Out", int((screenWidth-frame_width)/2), int((screenHeight+frame_height)/2))
+        if args.showvideo:
+            cv2.startWindowThread()
+            cv2.namedWindow("Out")
+            cv2.moveWindow("Out", int((screenWidth-frame_width)/2), int((screenHeight+frame_height)/2))
         mc.put(int(screenWidth/2), int(screenHeight/2)) #Place the mouse cursor in the center of the screen
         # Process frames until the video ends, or process is exited
-        too_many = False
-        not_enough = False
-        single = False
-        gaze = [[0, 0, 0]]
-        while cap.isOpened():
-            # Read the next frame
-            flag, frame = cap.read()
-            if not flag:
-                break
+        ### TODO: Load the models through `infer_network` ###
+        print("Video being shown: ", str(args.showvideo))
+        for precision in precisions:
+            print("Beginning test for precision {}.".format(precision))
+            frame_count=0
+            #fd_dir = os.path.join(args.fd_model, precision)
+            fl_dir = os.path.join(args.fl_model, precision)
+            hp_dir = os.path.join(args.hp_model, precision)
+            ge_dir = os.path.join(args.ge_model, precision)
+            fd_load_duration_ms = fd_infer_network.load_model(dir=fd_dir, name=fd_model)
+            fl_load_duration_ms = fl_infer_network.load_model(dir=fl_dir, name=fl_model)
+            hp_load_duration_ms = hp_infer_network.load_model(dir=hp_dir, name=hp_model)
+            ge_load_duration_ms = ge_infer_network.load_model(dir=ge_dir, name=ge_model)
 
-            #Flip the frame is the input is from the web cam
-            if flip: frame=cv2.flip(frame, 1)
+            too_many = False
+            not_enough = False
+            single = False
+            gaze = [[0, 0, 0]]
+            cap.set(property=cv2.CAP_PROP_POS_FRAMES, val=0)
+            while cap.isOpened():
 
-            frame_count+=1
-            cv2.imshow("Out", frame)
+                if args.num_frames!=None and frame_count>args.num_frames:
+                    break
 
-            # Break if escape key pressed
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+                # Read the next frame
+                flag, frame = cap.read()
+                if not flag:
+                    break
 
-            # Detect faces
-            #Preprocess the input
-            start_time = time()
-            p_frame = fd_infer_network.preprocess_input(frame)
-            fd_input_duration_ms = time() - start_time
+                #Flip the frame is the input is from the web cam
+                if flip: frame=cv2.flip(frame, 1)
 
-            #Infer the faces
-            start_time = time()
-            fd_infer_network.predict(p_frame)
-            fd_infer_duration_ms += time() - start_time
+                frame_count+=1
 
-            #Get the outputs
-            start_time = time()
-            coords = fd_infer_network.preprocess_output(threshold = args.prob_threshold)
-            fd_output_duration_ms += time() - start_time
+                frame = cv2.putText(frame, text, org, font, fontScale, color, thickness, cv2.LINE_AA)
+                if args.showvideo: cv2.imshow("Out", frame)
 
-            num_detections = len(coords)
+                # Break if escape key pressed
+                if cv2.waitKey(25) & 0xFF == ord('q'):
+                    break
 
-            ### Execute the pipeline only if one face is in the frame
-            if num_detections == 1:
-                too_many = False
-                not_enough = False
-                if not single:
-                    print("I see you. Move the mouse cursor with your eyes.")
-                    single=True
-
-                x_min, y_min, x_max, y_max = coords[0]
-                orig_x, orig_y = scale_dims(frame.shape, x_min, y_min)
-                x_max, y_max = scale_dims(frame.shape, x_max, y_max)
-                #frame = draw_box(frame,(orig_x, orig_y), (x_max, y_max))
-                cropped_frame = frame[orig_y:y_max, orig_x:x_max]
-
+                # Detect faces
                 #Preprocess the input
                 start_time = time()
-                frame_for_input = fl_infer_network.preprocess_input(cropped_frame)
-                fl_input_duration_ms = time() - start_time
+                p_frame = fd_infer_network.preprocess_input(frame)
+                fd_input_duration_ms = time() - start_time
 
-                #Run landmarks inference asynchronously
-                fl_infer_start_time = time()
-                fl_infer_network.predict(frame_for_input)
-
-                #Send cropped frame to head pose estimation
+                #Infer the faces
                 start_time = time()
-                frame_for_input = hp_infer_network.preprocess_input(cropped_frame)
-                hp_input_duration_ms += start_time
+                fd_infer_network.predict(p_frame)
+                fd_infer_duration_ms += time() - start_time
 
-                hp_infer_start_time = time()
-                hp_infer_network.predict(frame_for_input)
+                #Get the outputs
+                start_time = time()
+                coords = fd_infer_network.preprocess_output(threshold = args.prob_threshold)
+                fd_output_duration_ms += time() - start_time
 
-                #Wait for async inferences to complete
-                if fl_infer_network.wait()==0:
-                    fl_infer_duration_ms += time() - fl_infer_start_time
+                num_detections = len(coords)
+
+                ### Execute the pipeline only if one face is in the frame
+                if num_detections == 1:
+                    too_many = False
+                    not_enough = False
+                    if not single:
+                        text="I see you. Move the mouse cursor with your eyes."
+                        single=True
+
+                    x_min, y_min, x_max, y_max = coords[0]
+                    orig_x, orig_y = scale_dims(frame.shape, x_min, y_min)
+                    x_max, y_max = scale_dims(frame.shape, x_max, y_max)
+                    #frame = draw_box(frame,(orig_x, orig_y), (x_max, y_max))
+                    cropped_frame = frame[orig_y:y_max, orig_x:x_max]
+
+                    #facial landmar detection preprocess the input
                     start_time = time()
-                    landmarks = fl_infer_network.preprocess_output()
-                    scaled_lm = scale_landmarks(landmarks=landmarks[0], image_shape=cropped_frame.shape, orig=(orig_x, orig_y))
-                    fl_output_duration_ms = time() - start_time
+                    frame_for_input = fl_infer_network.preprocess_input(cropped_frame)
+                    fl_input_duration_ms = time() - start_time
 
-                if hp_infer_network.wait()==0:
-                    hp_infer_duration_ms += time() - hp_infer_start_time
+                    #Run landmarks inference asynchronously
+                    # do not measure time, not relevant since it is asynchronous
+                    fl_infer_network.predict(frame_for_input)
+
+                    #Send cropped frame to head pose estimation
                     start_time = time()
-                    y, p, r = hp_infer_network.preprocess_output()
-                    hp_output_duration_ms = time() - start_time
+                    frame_for_input = hp_infer_network.preprocess_input(cropped_frame)
+                    hp_input_duration_ms += time() - start_time
 
-                    input_duration, predict_duration, output_duration, gaze = ge_infer_network.predict(face_image=frame, landmarks=scaled_lm, head_pose_angles=[[y, p, r]])
-                    ge_input_duration_ms += input_duration
-                    ge_infer_duration_ms += predict_duration
-                    ge_output_duration_ms += output_duration
-                    #Move the mouse cursor
-                    mc.move(gaze[0][0], gaze[0][1])
+                    #Head pose infer
+                    hp_infer_network.predict(frame_for_input)
 
-            elif num_detections > 1:
-                single = False
-                not_enough=False
-                if not too_many:
-                    print("Too many faces confuse me. I need to see only one face.")
-                    too_many=True
-            else:
-                too_many = False
-                single=False
-                if not not_enough:
-                    print("Is there anybody out there?")
-                    not_enough=True
+                    #Wait for async inferences to complete
+                    if fl_infer_network.wait()==0:
+                        start_time = time()
+                        landmarks = fl_infer_network.preprocess_output()
+                        scaled_lm = scale_landmarks(landmarks=landmarks[0], image_shape=cropped_frame.shape, orig=(orig_x, orig_y))
+                        fl_output_duration_ms = time() - start_time
 
-        ## End While Loop
-        # Release the capture and destroy any OpenCV windows
-        print("Video is over. Good bye!")
+                    if hp_infer_network.wait()==0:
+                        start_time = time()
+                        y, p, r = hp_infer_network.preprocess_output()
+                        hp_output_duration_ms = time() - start_time
+
+                        input_duration, predict_duration, output_duration, gaze = ge_infer_network.predict(face_image=frame, landmarks=scaled_lm, head_pose_angles=[[y, p, r]])
+                        ge_input_duration_ms += input_duration
+                        ge_infer_duration_ms += predict_duration
+                        ge_output_duration_ms += output_duration
+                        #Move the mouse cursor
+
+                        mc.move(gaze[0][0], gaze[0][1])
+
+                elif num_detections > 1:
+                    single = False
+                    not_enough=False
+                    if not too_many:
+                        text="Too many faces confuse me. I need to see only one face."
+                        too_many=True
+                else:
+                    too_many = False
+                    single=False
+                    if not not_enough:
+                        text="Is there anybody out there?"
+                        not_enough=True
+
+            ## End While Loop
+            # Release the capture and destroy any OpenCV windows
+            print("Completed run for precision {}.".format(precision))
+            if args.benchmark:
+                metric_columns=np.array([[fd_load_duration_ms*1000, fl_load_duration_ms*1000, hp_load_duration_ms*1000, ge_load_duration_ms*1000],
+                            [fd_input_duration_ms*1000, fl_input_duration_ms*1000, hp_input_duration_ms*1000, ge_input_duration_ms*1000],
+                            [fd_infer_duration_ms*1000, None, None, ge_infer_duration_ms*1000],
+                            [fd_output_duration_ms*1000, fl_output_duration_ms*1000, hp_output_duration_ms*1000, ge_output_duration_ms*1000]
+                            ]).T
+                total_df.loc(axis=0)[:,precision] = metric_columns
+
+            #total_df.loc[:,precision]= metric_columns
+            #print(total_df)
+
+        ### End For Loop
         cap.release()
         cv2.waitKey(1)
         cv2.destroyAllWindows()
         cv2.waitKey(1)
-
         #Collect Stats
         #Setup dataframe
         if args.benchmark:
-            model_indeces=['facial detection', 'landmark detection', 'head pose', 'gaze estimation']
-            metric_columns={'load model':[fd_load_duration_ms*1000, fl_load_duration_ms*1000, hp_load_duration_ms*1000, ge_load_duration_ms*1000],
-                            'input prep':[fd_input_duration_ms*1000, fl_input_duration_ms*1000, hp_input_duration_ms*1000, ge_input_duration_ms*1000],
-                            'total predict':[fd_infer_duration_ms*1000, fl_infer_duration_ms*1000, hp_infer_duration_ms*1000, ge_infer_duration_ms*1000],
-                            'average predict':[fd_infer_duration_ms*1000/frame_count, fl_infer_duration_ms*1000/frame_count, hp_infer_duration_ms*1000/frame_count, ge_infer_duration_ms*1000/frame_count],
-                            'fetch output':[fd_output_duration_ms*1000, fl_output_duration_ms*1000, hp_output_duration_ms*1000, ge_output_duration_ms*1000],
-                            }
-            df = pd.DataFrame(metric_columns, index=model_indeces)
-            outF = open("gaze_stats.txt", "a")
+            avg_df = total_df/frame_count
             now = datetime.now()
-            outF.write("OpenVINO Results\n")
-            outF.write ("\nCurrent date and time:\n")
-            outF.write(now.strftime("%Y-%m-%d %H:%M:%S"))
-            outF.write("\nPlatform: {}".format(platform))
-            outF.write("\nDevice: {}".format(args.device))
-            outF.write("\nProbably Threshold: {}".format(args.prob_threshold))
-            outF.write("Precision: {}".format(args.precisions))
-            outF.write("Total frames: {}".format(frame_count))
-            print(df)
-            outF.write("\n\n*********************************************************************************\n\n\n")
-            outF.close()
-        '''
-        outF.write("\n\nFace Detection Stats")
-        outF.write("\nModel: {}".format(args.fd_model))
-        outF.write("\nModel Load Time: {:.2f} ms".format(fd_load_duration_ms*1000))
-        outF.write("\nTotal Inference Time: {:.2f} ms".format(fd_infer_duration_ms*1000))
-        outF.write("\nAverage Inference Time: {:.2f} ms".format(fd_infer_duration_ms*1000/frame_count))
-
-        outF.write("\n\nLandmark Detection Stats")
-        outF.write("\nModel: {}".format(args.fl_model))
-        outF.write("\nModel Load Time: {:.2f} ms".format(fl_load_duration_ms*1000))
-        outF.write("\nTotal Inference Time: {:.2f} ms".format(fl_infer_duration_ms*1000))
-        outF.write("\nAverage Inference Time: {:.2f} ms".format(fl_infer_duration_ms*1000/frame_count))
-
-        outF.write("\n\nHead Pose Estimation Stats")
-        outF.write("\nModel: {}".format(args.hp_model))
-        outF.write("\nModel Load Time: {:.2f} ms".format(hp_load_duration_ms*1000))
-        outF.write("\nTotal Inference Time: {:.2f} ms".format(hp_infer_duration_ms*1000))
-        outF.write("\nAverage Inference Time: {:.2f} ms".format(hp_infer_duration_ms*1000/frame_count))
-
-        outF.write("\n\nGaze Estimation Stats")
-        outF.write("\nModel: {}".format(args.ge_model))
-        outF.write("\nModel Load Time: {:.2f} ms".format(ge_load_duration_ms*1000))
-        outF.write("\nTotal Inference Time: {:.2f} ms".format(ge_infer_duration_ms*1000))
-        outF.write("\nAverage Inference Time: {:.2f} ms".format(ge_infer_duration_ms*1000/frame_count))
-        '''
+            print("OpenVINO Results")
+            print ("Current date and time: ",now.strftime("%Y-%m-%d %H:%M:%S"))
+            print("Platform: {}".format(platform))
+            print("Device: {}".format(args.device))
+            print("Probably Threshold: {}".format(args.prob_threshold))
+            print("Precision: {}".format(args.precisions))
+            print("Total frames: {}".format(frame_count))
+            print("\nTotal Durations(ms):")
+            print(total_df)
+            print("\nDuration(ms)/Frame:")
+            print(avg_df)
+            print("\n*********************************************************************************\n\n\n")
     except KeyboardInterrupt:
         #Collect Stats
         print("Detected keyboard interrupt")
         if args.benchmark:
-            model_indeces=['facial detection', 'landmark detection', 'head pose', 'gaze estimation']
-            metric_columns={'load model':[fd_load_duration_ms*1000, fl_load_duration_ms*1000, hp_load_duration_ms*1000, ge_load_duration_ms*1000],
-                            'input prep':[fd_input_duration_ms*1000, fl_input_duration_ms*1000, hp_input_duration_ms*1000, ge_input_duration_ms*1000],
-                            'predict':[fd_infer_duration_ms*1000, fl_infer_duration_ms*1000, hp_infer_duration_ms*1000, ge_infer_duration_ms*1000],
-                            'fetch output':[fd_output_duration_ms*1000, fl_output_duration_ms*1000, hp_output_duration_ms*1000, ge_output_duration_ms*1000],
-                            }
-
-            total_df = pd.DataFrame(metric_columns, index=model_indeces)
+            metric_columns=np.array([[fd_load_duration_ms*1000, fl_load_duration_ms*1000, hp_load_duration_ms*1000, ge_load_duration_ms*1000],
+                        [fd_input_duration_ms*1000, fl_input_duration_ms*1000, hp_input_duration_ms*1000, ge_input_duration_ms*1000],
+                        [fd_infer_duration_ms*1000, None, None, ge_infer_duration_ms*1000],
+                        [fd_output_duration_ms*1000, fl_output_duration_ms*1000, hp_output_duration_ms*1000, ge_output_duration_ms*1000]
+                        ]).T
+            total_df.loc(axis=0)[:,precision] = metric_columns
             avg_df = total_df/frame_count
-            print("df ", total_df)
-            print("avg df", avg_df)
-            outF = open("gaze_stats.txt", "a")
-            if args.fancy:
-                from pandas_profiling import ProfileReport
-                profile = ProfileReport(total_df, "Gaze Estimation Profile Report", explorative=True)
-                profile.to_file('gaze_profile_report.html')
 
             now = datetime.now()
-            outF.write("OpenVINO Results\n")
-            outF.write ("\nCurrent date and time:\n")
-            outF.write(now.strftime("%Y-%m-%d %H:%M:%S"))
-            outF.write("\nPlatform: {}".format(platform))
-            outF.write("\nDevice: {}".format(args.device))
-            outF.write("\nProbably Threshold: {}".format(args.prob_threshold))
-            outF.write("Precision: {}".format(args.precisions))
-            outF.write("Total frames: {}".format(frame_count))
-            outF.write("\n\n*********************************************************************************\n\n\n")
-            outF.close()
+            print("OpenVINO Results\n")
+            print ("Current date and time: ",now.strftime("%Y-%m-%d %H:%M:%S"))
+            print("Platform: {}".format(platform))
+            print("Device: {}".format(args.device))
+            print("Probably Threshold: {}".format(args.prob_threshold))
+            print("Precision: {}".format(args.precisions))
+            print("Total frames: {}".format(frame_count))
+            print("\nTotal Durations(ms):")
+            print(total_df)
+            print("\nDuration/Frame(ms):")
+            print(avg_df)
+            print("\n*********************************************************************************\n\n\n")
         leave_program()
     except Exception as e:
          print("Exception: ",e)

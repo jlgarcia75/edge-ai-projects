@@ -1,0 +1,48 @@
+Beginning test for precision FP32.
+Completed run for precision FP32.
+Beginning test for precision FP16.
+Completed run for precision FP16.
+Beginning test for precision FP32-INT8.
+Completed run for precision FP32-INT8.
+OpenVINO Results
+Current date and time:  2020-06-06 20:43:41
+Platform: darwin
+Device: CPU
+Probably Threshold: 0.3
+Precision: FP32,FP16,FP32-INT8
+Total frames: 595
+Total Durations(ms):
+                             load model input prep  predict fetch output
+Model              Precision                                            
+facial detection   FP32         516.152    0.51713  7074.78      404.306
+                   FP16          188.92    0.46587  14162.3      800.369
+                   FP32-INT8    211.125   0.515223  21423.6      1203.71
+landmark detection FP32          123.09   0.041008     None    0.0920296
+                   FP16         71.0502  0.0638962     None     0.109911
+                   FP32-INT8    173.307   0.041008     None    0.0910759
+head pose          FP32          82.746    30.7984     None     0.318289
+                   FP16         131.177    61.1501     None      0.31209
+                   FP32-INT8    866.439    91.2483     None     0.296831
+gaze estimation    FP32         91.9731     18.389  1039.61      29.9032
+                   FP16         111.482    36.2659  2087.16       59.726
+                   FP32-INT8    879.808    53.5054  2876.43      87.3077
+Duration(ms)/Frame:
+                             load model   input prep  predict fetch output
+Model              Precision                                              
+facial detection   FP32        0.867483  0.000869126  11.8904     0.679506
+                   FP16        0.317512  0.000782975  23.8021      1.34516
+                   FP32-INT8   0.354832   0.00086592  36.0061      2.02305
+landmark detection FP32        0.206874   6.8921e-05      NaN  0.000154672
+                   FP16        0.119412  0.000107389      NaN  0.000184724
+                   FP32-INT8   0.291272   6.8921e-05      NaN  0.000153069
+head pose          FP32        0.139069    0.0517621      NaN  0.000534939
+                   FP16        0.220465     0.102773      NaN  0.000524521
+                   FP32-INT8     1.4562     0.153358      NaN  0.000498876
+gaze estimation    FP32        0.154577    0.0309059  1.74725    0.0502574
+                   FP16        0.187365     0.060951  3.50784      0.10038
+                   FP32-INT8    1.47867    0.0899251  4.83433     0.146736
+
+*********************************************************************************
+
+
+

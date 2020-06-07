@@ -31,4 +31,4 @@ class MouseController:
         pyautogui.moveTo(x, y)
 
     def onscreen(self, x, y):
-        pyautogui.onscreen(x, y)
+        pyautogui.onScreen(x, y)
