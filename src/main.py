@@ -102,9 +102,6 @@ def build_argparser():
                     "especially if using webcam. (100 by default)")
     parser.add_argument("-sv", "--showvideo", required=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'],
                     default=True, help="Show video while running? True|False. (True by default)")
-    parser.add_argument("-async","--asyncinfer", required=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'],
-                    default=True,
-                    help="Run asynchronouse inference landmarks and head pose models? True|False. (True by default)")
 
     return parser
 
@@ -221,9 +218,12 @@ def infer_on_stream(args):
         # Process frames until the video ends, or process is exited
         ### TODO: Load the models through `infer_network` ###
         print("Video being shown: ", str(args.showvideo))
+        #Dictionary to store runtimes for each precision
+        runtime={}
         for precision in precisions:
             print("Beginning test for precision {}.".format(precision))
             frame_count=0
+            runtime_start = time()
             #fd_dir = os.path.join(args.fd_model, precision)
             fl_dir = os.path.join(args.fl_model, precision)
             hp_dir = os.path.join(args.hp_model, precision)
@@ -343,18 +343,18 @@ def infer_on_stream(args):
                         not_enough=True
 
             ## End While Loop
+            runtime[precision] = time() - runtime_start
             # Release the capture and destroy any OpenCV windows
             print("Completed run for precision {}.".format(precision))
             if args.benchmark:
+                rt_df = pd.DataFrame.from_dict(runtime, orient='index', columns=["Total runtime"])
+                rt_df["Average runtime/frame"] = rt_df["Total runtime"]/frame_count
                 metric_columns=np.array([[fd_load_duration_ms*1000, fl_load_duration_ms*1000, hp_load_duration_ms*1000, ge_load_duration_ms*1000],
                             [fd_input_duration_ms*1000, fl_input_duration_ms*1000, hp_input_duration_ms*1000, ge_input_duration_ms*1000],
                             [fd_infer_duration_ms*1000, None, None, ge_infer_duration_ms*1000],
                             [fd_output_duration_ms*1000, fl_output_duration_ms*1000, hp_output_duration_ms*1000, ge_output_duration_ms*1000]
                             ]).T
                 total_df.loc(axis=0)[:,precision] = metric_columns
-
-            #total_df.loc[:,precision]= metric_columns
-            #print(total_df)
 
         ### End For Loop
         cap.release()
@@ -373,15 +373,19 @@ def infer_on_stream(args):
             print("Probably Threshold: {}".format(args.prob_threshold))
             print("Precision: {}".format(args.precisions))
             print("Total frames: {}".format(frame_count))
-            print("\nTotal Durations(ms):")
+            print("Total runtimes:")
+            print(rt_df)
+            print("\nTotal Durations per phase(ms):")
             print(total_df)
-            print("\nDuration(ms)/Frame:")
+            print("\nDuration (ms) per phase /Frame:")
             print(avg_df)
             print("\n*********************************************************************************\n\n\n")
     except KeyboardInterrupt:
         #Collect Stats
         print("Detected keyboard interrupt")
         if args.benchmark:
+            rt_df = pd.DataFrame.from_dict(runtime, orient='index', columns=["Total runtime"])
+            rt_df["Average runtime/frame"] = rt_df["Total runtime"]/frame_count
             metric_columns=np.array([[fd_load_duration_ms*1000, fl_load_duration_ms*1000, hp_load_duration_ms*1000, ge_load_duration_ms*1000],
                         [fd_input_duration_ms*1000, fl_input_duration_ms*1000, hp_input_duration_ms*1000, ge_input_duration_ms*1000],
                         [fd_infer_duration_ms*1000, None, None, ge_infer_duration_ms*1000],
@@ -398,9 +402,11 @@ def infer_on_stream(args):
             print("Probably Threshold: {}".format(args.prob_threshold))
             print("Precision: {}".format(args.precisions))
             print("Total frames: {}".format(frame_count))
-            print("\nTotal Durations(ms):")
+            print("Total runtimes:")
+            print(rt_df)
+            print("\nTotal Durations per phase(ms):")
             print(total_df)
-            print("\nDuration/Frame(ms):")
+            print("\nDuration(ms) per phase/Frame:")
             print(avg_df)
             print("\n*********************************************************************************\n\n\n")
         leave_program()

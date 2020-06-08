@@ -43,6 +43,7 @@ class FacialLandmarks:
         self.check_model()
         self.exec_net = self.core.load_network(self.model, self.device, num_requests=0)
         duration_ms = time.time() - start_time
+
         # Add an extension, if applicable
         if self.extensions:
             self.plugin.add_extension(self.extensions, self.device)

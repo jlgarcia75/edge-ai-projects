@@ -1,0 +1,8 @@
+python_version = 3.7
+[setupvars.sh] OpenVINO environment initialized
+Video being shown:  True
+Beginning test for precision FP32.
+Exception:  Failed to create plugin libHeteroPlugin.dylib for device HETERO
+Please, check your environment
+Cannot load library 'libHeteroPlugin.dylib': dlopen(libHeteroPlugin.dylib, 1): image not found
+
