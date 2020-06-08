@@ -50,6 +50,7 @@ class FacialLandmarks:
 
         return duration_ms
 
+        #Async infer
     def predict(self, image):
         '''
         TODO: This method needs to be completed by you
@@ -57,7 +58,10 @@ class FacialLandmarks:
         '''
         #Run Inference
         self.exec_net.start_async(request_id=0,inputs={self.input_name:image})
-        return
+
+    #Synchronous infer
+    def sync_infer(self, image):
+        self.exec_net.infer({self.input_name:image})
 
     def wait(self):
         ### Wait for the request to be complete. ###

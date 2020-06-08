@@ -45,8 +45,6 @@ class HeadPose:
         if self.extensions:
             self.plugin.add_extension(self.extensions, self.device)
 
-
-
         return duration_ms
 
     def predict(self, image):
@@ -57,7 +55,9 @@ class HeadPose:
         #Run Inference
         self.exec_net.start_async(request_id=0,inputs={self.input_name:image})
 
-        return
+    #Synchronous infer
+    def sync_infer(self, image):
+        self.exec_net.infer({self.input_name:image})
 
     def wait(self):
     ### Wait for the request to be complete. ###

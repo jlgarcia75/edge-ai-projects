@@ -144,6 +144,25 @@ def process_model_names(name):
             dir, _ = name.rsplit('\\',1)
         return dir, new_name
 
+def output_bm(args, t_df, r_df, frames):
+    avg_df = t_df/frames
+    now = datetime.now()
+    print("OpenVINO Results")
+    print ("Current date and time: ",now.strftime("%Y-%m-%d %H:%M:%S"))
+    print("Platform: {}".format(platform))
+    print("Device: {}".format(args.device))
+    print("Probably Threshold: {}".format(args.prob_threshold))
+    print("Precision: {}".format(args.precisions))
+    print("Total frames: {}".format(frames))
+    print("Total runtimes(s):")
+    print(r_df)
+    print("\nTotal Durations per phase(ms):")
+    print(t_df)
+    print("\nDuration (ms) per phase /Frame:")
+    print(avg_df)
+    print("\n*********************************************************************************\n\n\n")
+
+def perform_inference(network, input_image)
 def infer_on_stream(args):
     """
     Initialize the inference network, stream video to network,
@@ -176,9 +195,11 @@ def infer_on_stream(args):
         fd_output_duration_ms  = 0
 
         fl_input_duration_ms = 0
+        fl_infer_duration_ms = 0
         fl_output_duration_ms = 0
 
         hp_input_duration_ms = 0
+        hp_infer_duration_ms = 0
         hp_output_duration_ms = 0
 
         ge_infer_duration_ms  = 0
@@ -297,9 +318,15 @@ def infer_on_stream(args):
                     frame_for_input = fl_infer_network.preprocess_input(cropped_frame)
                     fl_input_duration_ms += time() - start_time
 
-                    #Run landmarks inference asynchronously
-                    # do not measure time, not relevant since it is asynchronous
-                    fl_infer_network.predict(frame_for_input)
+                    #Run landmarks inference synchronously
+                    start_time = time()
+                    fl_infer_network.sync_infer(frame_for_input)
+                    fl_infer_duration_ms += time() - start_time
+
+                    start_time = time()
+                    landmarks = fl_infer_network.preprocess_output()
+                    scaled_lm = scale_landmarks(landmarks=landmarks[0], image_shape=cropped_frame.shape, orig=(orig_x, orig_y))
+                    fl_output_duration_ms += time() - start_time
 
                     #Send cropped frame to head pose estimation
                     start_time = time()
@@ -307,27 +334,21 @@ def infer_on_stream(args):
                     hp_input_duration_ms += time() - start_time
 
                     #Head pose infer
-                    hp_infer_network.predict(frame_for_input)
+                    start_time = time()
+                    hp_infer_network.sync_infer(frame_for_input)
+                    hp_infer_duration_ms += time() - start_time
 
-                    #Wait for async inferences to complete
-                    if fl_infer_network.wait()==0:
-                        start_time = time()
-                        landmarks = fl_infer_network.preprocess_output()
-                        scaled_lm = scale_landmarks(landmarks=landmarks[0], image_shape=cropped_frame.shape, orig=(orig_x, orig_y))
-                        fl_output_duration_ms += time() - start_time
+                    start_time = time()
+                    y, p, r = hp_infer_network.preprocess_output()
+                    hp_output_duration_ms += time() - start_time
 
-                    if hp_infer_network.wait()==0:
-                        start_time = time()
-                        y, p, r = hp_infer_network.preprocess_output()
-                        hp_output_duration_ms += time() - start_time
+                    input_duration, predict_duration, output_duration, gaze = ge_infer_network.predict(face_image=frame, landmarks=scaled_lm, head_pose_angles=[[y, p, r]])
+                    ge_input_duration_ms += input_duration
+                    ge_infer_duration_ms += predict_duration
+                    ge_output_duration_ms += output_duration
+                    #Move the   mouse cursor
 
-                        input_duration, predict_duration, output_duration, gaze = ge_infer_network.predict(face_image=frame, landmarks=scaled_lm, head_pose_angles=[[y, p, r]])
-                        ge_input_duration_ms += input_duration
-                        ge_infer_duration_ms += predict_duration
-                        ge_output_duration_ms += output_duration
-                        #Move the mouse cursor
-
-                        mc.move(gaze[0][0], gaze[0][1])
+                    mc.move(gaze[0][0], gaze[0][1])
 
                 elif num_detections > 1:
                     single = False
@@ -364,22 +385,7 @@ def infer_on_stream(args):
         #Collect Stats
         #Setup dataframe
         if args.benchmark:
-            avg_df = total_df/frame_count
-            now = datetime.now()
-            print("OpenVINO Results")
-            print ("Current date and time: ",now.strftime("%Y-%m-%d %H:%M:%S"))
-            print("Platform: {}".format(platform))
-            print("Device: {}".format(args.device))
-            print("Probably Threshold: {}".format(args.prob_threshold))
-            print("Precision: {}".format(args.precisions))
-            print("Total frames: {}".format(frame_count))
-            print("Total runtimes:")
-            print(rt_df)
-            print("\nTotal Durations per phase(ms):")
-            print(total_df)
-            print("\nDuration (ms) per phase /Frame:")
-            print(avg_df)
-            print("\n*********************************************************************************\n\n\n")
+            output_bm(args, total_df, rt_df, frame_count)
     except KeyboardInterrupt:
         #Collect Stats
         print("Detected keyboard interrupt")
@@ -392,23 +398,8 @@ def infer_on_stream(args):
                         [fd_output_duration_ms*1000, fl_output_duration_ms*1000, hp_output_duration_ms*1000, ge_output_duration_ms*1000]
                         ]).T
             total_df.loc(axis=0)[:,precision] = metric_columns
-            avg_df = total_df/frame_count
+            output_bm(args, total_df, rt_df, frame_count)
 
-            now = datetime.now()
-            print("OpenVINO Results\n")
-            print ("Current date and time: ",now.strftime("%Y-%m-%d %H:%M:%S"))
-            print("Platform: {}".format(platform))
-            print("Device: {}".format(args.device))
-            print("Probably Threshold: {}".format(args.prob_threshold))
-            print("Precision: {}".format(args.precisions))
-            print("Total frames: {}".format(frame_count))
-            print("Total runtimes:")
-            print(rt_df)
-            print("\nTotal Durations per phase(ms):")
-            print(total_df)
-            print("\nDuration(ms) per phase/Frame:")
-            print(avg_df)
-            print("\n*********************************************************************************\n\n\n")
         leave_program()
     except Exception as e:
          print("Exception: ",e)
