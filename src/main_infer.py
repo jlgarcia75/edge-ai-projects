@@ -24,9 +24,10 @@ import numpy as np
 from sys import exit
 from datetime import datetime
 from time import time
-from face_detection import FaceDetection
-from facial_landmarks import FacialLandmarks
-from head_pose import HeadPose
+#from face_detection import FaceDetection
+#from facial_landmarks import FacialLandmarks
+#from head_pose import HeadPose
+from model_base import ModelBase
 from gaze_estimation import GazeEstimation
 from mouse_controller import MouseController
 from MediaReader import MediaReader
@@ -92,7 +93,7 @@ def build_argparser():
                              "CPU, GPU, FPGA or MYRIAD is acceptable. The program "
                              "will look for a suitable plugin for the device "
                              "specified (CPU by default)")
-    parser.add_argument("-pt", "--conf_threshold", type=float, default=0.3, required=False,
+    parser.add_argument("-ct", "--conf_threshold", type=float, default=0.3, required=False,
                         help="Probability threshold for detections filtering"
                         " (0.3 by default)")
     parser.add_argument("-bm", "--benchmark", required=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'],
@@ -236,9 +237,9 @@ def infer_on_stream(args):
         _, ge_model = process_model_names(args.ge_model)
 
          # Initialize the classes
-        fd_infer_network = FaceDetection(dev=args.device, ext=args.cpu_extension, threshold=args.conf_threshold)
-        fl_infer_network = FacialLandmarks(dev=args.device, ext=args.cpu_extension)
-        hp_infer_network = HeadPose(dev=args.device, ext=args.cpu_extension)
+        fd_infer_network = ModelBase(dev=args.device, ext=args.cpu_extension, threshold=args.conf_threshold)
+        fl_infer_network = ModelBase(dev=args.device, ext=args.cpu_extension)
+        hp_infer_network = ModelBase(dev=args.device, ext=args.cpu_extension)
         ge_infer_network = GazeEstimation(dev=args.device, ext=args.cpu_extension)
 
         flip=False
@@ -303,7 +304,8 @@ def infer_on_stream(args):
                     break
 
                 # Detect faces
-                fd_duration, coords = run_pipeline(fd_infer_network, frame, fd_duration)
+                fd_duration, outputs = run_pipeline(fd_infer_network, frame, fd_duration)
+                coords = [[x_min, y_min, x_max, y_max] for _, _, conf, x_min, y_min, x_max, y_max in outputs[fd_infer_network.output_name][0][0] if conf>=args.conf_threshold]
                 num_detections = len(coords)
                 ### Execute the pipeline only if one face is in the frame
                 if num_detections == 1:
@@ -320,12 +322,15 @@ def infer_on_stream(args):
                     cropped_frame = frame[orig_y:y_max, orig_x:x_max]
 
                     #facial landmark detection preprocess the input
-                    fl_duration, landmarks = run_pipeline(fl_infer_network, cropped_frame, fl_duration)
+                    fl_duration, outputs = run_pipeline(fl_infer_network, cropped_frame, fl_duration)
+                    landmarks = outputs[fl_infer_network.output_name]
                     scaled_lm = scale_landmarks(landmarks=landmarks[0], image_shape=cropped_frame.shape, orig=(orig_x, orig_y))
 
                     #Send cropped frame to head pose estimation
-                    hp_duration, hp_angles = run_pipeline(hp_infer_network, cropped_frame, hp_duration)
+                    hp_duration, outputs = run_pipeline(hp_infer_network, cropped_frame, hp_duration)
+                    hp_angles = [outputs['angle_y_fc'][0], outputs['angle_p_fc'][0], outputs['angle_r_fc'][0]]
 
+                #    ge_duration, gaze = run_pipeline(ge_infer_network, )
                     input_duration, predict_duration, output_duration, gaze = ge_infer_network.sync_infer(face_image=frame, landmarks=scaled_lm, head_pose_angles=[hp_angles])
                     ge_duration['input'] += input_duration
                     ge_duration['infer'] += predict_duration

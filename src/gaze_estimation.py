@@ -78,13 +78,12 @@ class GazeEstimation:
         left_eye = landmarks[1]
         left_crop = face_image[left_eye[1]-eye_offset:left_eye[1]+eye_offset, left_eye[0]-eye_offset:left_eye[0]+eye_offset]
         right_crop = face_image[right_eye[1]-eye_offset:right_eye[1]+eye_offset, right_eye[0]-eye_offset:right_eye[0]+eye_offset]
-        left_image = self.preprocess_input(image=left_crop)
-        right_image = self.preprocess_input(image=right_crop)
+        eye_images = list(map(self.preprocess_input,[left_crop, right_crop]))
         input_duration_ms = time.time() - start_time
 
         #Run Inference
         start_time = time.time()
-        self.exec_net.infer({self.left_eye_input:left_image, self.right_eye_input:right_image, self.head_pose_input:head_pose_angles})
+        self.exec_net.infer({self.left_eye_input:eye_images[0], self.right_eye_input:eye_images[1], self.head_pose_input:head_pose_angles})
         infer_duration_ms = time.time() - start_time
 
         #Get the outputs

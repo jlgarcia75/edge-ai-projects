@@ -8,15 +8,16 @@ import cv2
 import sys
 import os
 
-class HeadPose:
+class ModelBase:
     '''
     Class for the Face Detection Model.
     '''
-    def __init__(self, dev, ext=None):
+    def __init__(self, dev, ext=None, threshold=None):
         self.model = None
         self.core = None
-        self.device=dev
+        self.device = dev
         self.extensions= ext
+        self.threshold = threshold
 
 
     def load_model(self, dir, name):
@@ -34,6 +35,7 @@ class HeadPose:
 
         self.input_name=next(iter(self.model.inputs))
         self.input_shape=self.model.inputs[self.input_name].shape
+        self.output_name=next(iter(self.model.outputs))
 
         start_time = time.time()
         self.core = IECore()
@@ -43,25 +45,26 @@ class HeadPose:
         duration_ms = time.time() - start_time
         # Add an extension, if applicable
         if self.extensions:
-            self.plugin.add_extension(self.extensions, self.device)
+            self.core.add_extension(self.extensions, self.device)
 
         return duration_ms
 
     def predict(self, image):
         '''
         TODO: This method needs to be completed by you
-        Returns: None
+        Returns: Duration of inference time, new image with detections
         '''
         #Run Inference
         self.exec_net.start_async(request_id=0,inputs={self.input_name:image})
-
-    #Synchronous infer
-    def sync_infer(self, image):
-        self.exec_net.infer({self.input_name:image})
+        return
 
     def wait(self):
     ### Wait for the request to be complete. ###
         return self.exec_net.requests[0].wait()
+        
+    #Synchronous infer
+    def sync_infer(self, image):
+        self.exec_net.infer({self.input_name:image})
 
     def check_model(self):
         '''
@@ -72,8 +75,9 @@ class HeadPose:
         None.
 
         '''
+        core = IECore()
          # Get the supported layers of the network
-        supported_layers = self.core.query_network(network=self.model, device_name=self.device)
+        supported_layers = core.query_network(network=self.model, device_name=self.device)
 
         # Check for any unsupported layers, and let the user
         # know if anything is missing. Exit the program, if so.
@@ -81,7 +85,7 @@ class HeadPose:
         unsupported_layers = [l for l in self.model.layers.keys() if l not in supported_layers]
         if len(unsupported_layers) != 0:
             print("The following layers are not supported by the plugin for specified device {}:\n {}".format(self.device, ', '.join(unsupported_layers)))
-            print(f"Please try to specify {self.device} extensions library path in sample's command line parameters using -l or --extension command line argument")
+            print(f"Please try to specify {self.device} extensions library path in sample's command line parameters using -l or --extension command line argument.")
             sys.exit(1)
 
 
@@ -99,9 +103,10 @@ class HeadPose:
         return new_image
 
     def preprocess_output(self):
-    #Get the outputs
-        yaw = self.exec_net.requests[0].outputs['angle_y_fc']
-        pitch = self.exec_net.requests[0].outputs['angle_p_fc']
-        roll = self.exec_net.requests[0].outputs['angle_r_fc']
+        '''
+        TODO: This method needs to be completed by you
+        Creates array of box coordinates from outputs
 
-        return yaw, pitch, roll
+        '''
+        #Get the outputs
+        return self.exec_net.requests[0].outputs

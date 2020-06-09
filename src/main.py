@@ -24,9 +24,10 @@ import numpy as np
 from sys import exit
 from datetime import datetime
 from time import time
-from face_detection import FaceDetection
-from facial_landmarks import FacialLandmarks
-from head_pose import HeadPose
+#from face_detection import FaceDetection
+#from facial_landmarks import FacialLandmarks
+#from head_pose import HeadPose
+from model_base import ModelBase
 from gaze_estimation import GazeEstimation
 from mouse_controller import MouseController
 from MediaReader import MediaReader
@@ -92,7 +93,7 @@ def build_argparser():
                              "CPU, GPU, FPGA or MYRIAD is acceptable. The program "
                              "will look for a suitable plugin for the device "
                              "specified (CPU by default)")
-    parser.add_argument("-pt", "--prob_threshold", type=float, default=0.3, required=False,
+    parser.add_argument("-ct", "--conf_threshold", type=float, default=0.3, required=False,
                         help="Probability threshold for detections filtering"
                         " (0.3 by default)")
     parser.add_argument("-bm", "--benchmark", required=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'],
@@ -194,9 +195,9 @@ def infer_on_stream(args):
 
 
          # Initialise the classes
-        fd_infer_network = FaceDetection(dev=args.device, ext=args.cpu_extension)
-        fl_infer_network = FacialLandmarks(dev=args.device, ext=args.cpu_extension)
-        hp_infer_network = HeadPose(dev=args.device, ext=args.cpu_extension)
+        fd_infer_network = ModelBase(dev=args.device, ext=args.cpu_extension)
+        fl_infer_network = ModelBase(dev=args.device, ext=args.cpu_extension)
+        hp_infer_network = ModelBase(dev=args.device, ext=args.cpu_extension)
         ge_infer_network = GazeEstimation(dev=args.device, ext=args.cpu_extension)
 
         flip=False
@@ -268,12 +269,13 @@ def infer_on_stream(args):
 
                 #Infer the faces
                 start_time = time()
-                fd_infer_network.predict(p_frame)
+                fd_infer_network.sync_infer(p_frame)
                 fd_infer_duration_ms += time() - start_time
 
                 #Get the outputs
                 start_time = time()
-                coords = fd_infer_network.preprocess_output(threshold = args.prob_threshold)
+                outputs = fd_infer_network.preprocess_output()
+                coords = [[x_min, y_min, x_max, y_max] for _, _, conf, x_min, y_min, x_max, y_max in outputs[fd_infer_network.output_name][0][0] if conf>=args.conf_threshold]
                 fd_output_duration_ms += time() - start_time
 
                 num_detections = len(coords)
@@ -312,16 +314,18 @@ def infer_on_stream(args):
                     #Wait for async inferences to complete
                     if fl_infer_network.wait()==0:
                         start_time = time()
-                        landmarks = fl_infer_network.preprocess_output()
+                        outputs = fl_infer_network.preprocess_output()
+                        landmarks = outputs[fl_infer_network.output_name]
                         scaled_lm = scale_landmarks(landmarks=landmarks[0], image_shape=cropped_frame.shape, orig=(orig_x, orig_y))
                         fl_output_duration_ms += time() - start_time
 
                     if hp_infer_network.wait()==0:
                         start_time = time()
-                        y, p, r = hp_infer_network.preprocess_output()
+                        outputs = hp_infer_network.preprocess_output()
+                        hp_angles = [outputs['angle_y_fc'][0], outputs['angle_p_fc'][0], outputs['angle_r_fc'][0]]
                         hp_output_duration_ms += time() - start_time
 
-                        input_duration, predict_duration, output_duration, gaze = ge_infer_network.predict(face_image=frame, landmarks=scaled_lm, head_pose_angles=[[y, p, r]])
+                        input_duration, predict_duration, output_duration, gaze = ge_infer_network.sync_infer(face_image=frame, landmarks=scaled_lm, head_pose_angles=[hp_angles])
                         ge_input_duration_ms += input_duration
                         ge_infer_duration_ms += predict_duration
                         ge_output_duration_ms += output_duration
@@ -370,7 +374,7 @@ def infer_on_stream(args):
             print ("Current date and time: ",now.strftime("%Y-%m-%d %H:%M:%S"))
             print("Platform: {}".format(platform))
             print("Device: {}".format(args.device))
-            print("Probably Threshold: {}".format(args.prob_threshold))
+            print("Probably Threshold: {}".format(args.conf_threshold))
             print("Precision: {}".format(args.precisions))
             print("Total frames: {}".format(frame_count))
             print("Total runtimes:")
@@ -399,7 +403,7 @@ def infer_on_stream(args):
             print ("Current date and time: ",now.strftime("%Y-%m-%d %H:%M:%S"))
             print("Platform: {}".format(platform))
             print("Device: {}".format(args.device))
-            print("Probably Threshold: {}".format(args.prob_threshold))
+            print("Probably Threshold: {}".format(args.conf_threshold))
             print("Precision: {}".format(args.precisions))
             print("Total frames: {}".format(frame_count))
             print("Total runtimes:")
