@@ -92,7 +92,7 @@ def build_argparser():
                              "CPU, GPU, FPGA or MYRIAD is acceptable. The program "
                              "will look for a suitable plugin for the device "
                              "specified (CPU by default)")
-    parser.add_argument("-pt", "--prob_threshold", type=float, default=0.3, required=False,
+    parser.add_argument("-pt", "--conf_threshold", type=float, default=0.3, required=False,
                         help="Probability threshold for detections filtering"
                         " (0.3 by default)")
     parser.add_argument("-bm", "--benchmark", required=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'],
@@ -151,7 +151,7 @@ def output_bm(args, t_df, r_df, frames):
     print ("Current date and time: ",now.strftime("%Y-%m-%d %H:%M:%S"))
     print("Platform: {}".format(platform))
     print("Device: {}".format(args.device))
-    print("Probably Threshold: {}".format(args.prob_threshold))
+    print("Probably Threshold: {}".format(args.conf_threshold))
     print("Precision: {}".format(args.precisions))
     print("Total frames: {}".format(frames))
     print("Total runtimes(s):")
@@ -162,7 +162,27 @@ def output_bm(args, t_df, r_df, frames):
     print(avg_df)
     print("\n*********************************************************************************\n\n\n")
 
-def perform_inference(network, input_image)
+def run_pipeline(network, input_image, duration):
+    # Detect faces
+    #Preprocess the input
+
+    start_time = time()
+    p_image = network.preprocess_input(input_image)
+    duration['input'] += time() - start_time
+    #print("duration ", duration['input']*100000)
+
+    #Infer the faces
+    start_time = time()
+    network.sync_infer(p_image)
+    duration['infer'] += time() - start_time
+
+    #Get the outputs
+    start_time = time()
+    output = network.preprocess_output()
+    duration['output'] += time() - start_time
+
+    return duration, output
+
 def infer_on_stream(args):
     """
     Initialize the inference network, stream video to network,
@@ -182,9 +202,13 @@ def infer_on_stream(args):
         text = ""
         #######################################
         precisions=args.precisions.split(",")
-
+        timing_results = {}
+        fd_duration = {'load':0,'input':0, 'infer':0, 'output':0}
+        fl_duration = {'load':0,'input':0, 'infer':0, 'output':0}
+        hp_duration = {'load':0,'input':0, 'infer':0, 'output':0}
+        ge_duration = {'load':0,'input':0, 'infer':0, 'output':0}
         if args.benchmark:
-            columns=['load model','input prep','predict','fetch output']
+            columns=['load','input','infer','output']
             model_indeces=['facial detection', 'landmark detection', 'head pose', 'gaze estimation']
             iterables = [model_indeces,precisions]
             index = pd.MultiIndex.from_product(iterables, names=['Model','Precision'])
@@ -206,16 +230,13 @@ def infer_on_stream(args):
         ge_input_duration_ms = 0
         ge_output_duration_ms = 0
 
-
-
         fd_dir, fd_model = process_model_names(args.fd_model)
         _, fl_model = process_model_names(args.fl_model)
         _, hp_model = process_model_names(args.hp_model)
         _, ge_model = process_model_names(args.ge_model)
 
-
-         # Initialise the classes
-        fd_infer_network = FaceDetection(dev=args.device, ext=args.cpu_extension)
+         # Initialize the classes
+        fd_infer_network = FaceDetection(dev=args.device, ext=args.cpu_extension, threshold=args.conf_threshold)
         fl_infer_network = FacialLandmarks(dev=args.device, ext=args.cpu_extension)
         hp_infer_network = HeadPose(dev=args.device, ext=args.cpu_extension)
         ge_infer_network = GazeEstimation(dev=args.device, ext=args.cpu_extension)
@@ -249,10 +270,10 @@ def infer_on_stream(args):
             fl_dir = os.path.join(args.fl_model, precision)
             hp_dir = os.path.join(args.hp_model, precision)
             ge_dir = os.path.join(args.ge_model, precision)
-            fd_load_duration_ms = fd_infer_network.load_model(dir=fd_dir, name=fd_model)
-            fl_load_duration_ms = fl_infer_network.load_model(dir=fl_dir, name=fl_model)
-            hp_load_duration_ms = hp_infer_network.load_model(dir=hp_dir, name=hp_model)
-            ge_load_duration_ms = ge_infer_network.load_model(dir=ge_dir, name=ge_model)
+            fd_duration['load'] = fd_infer_network.load_model(dir=fd_dir, name=fd_model)
+            fl_duration['load'] = fl_infer_network.load_model(dir=fl_dir, name=fl_model)
+            hp_duration['load'] = hp_infer_network.load_model(dir=hp_dir, name=hp_model)
+            ge_duration['load'] = ge_infer_network.load_model(dir=ge_dir, name=ge_model)
 
             too_many = False
             not_enough = False
@@ -282,23 +303,8 @@ def infer_on_stream(args):
                     break
 
                 # Detect faces
-                #Preprocess the input
-                start_time = time()
-                p_frame = fd_infer_network.preprocess_input(frame)
-                fd_input_duration_ms = time() - start_time
-
-                #Infer the faces
-                start_time = time()
-                fd_infer_network.predict(p_frame)
-                fd_infer_duration_ms += time() - start_time
-
-                #Get the outputs
-                start_time = time()
-                coords = fd_infer_network.preprocess_output(threshold = args.prob_threshold)
-                fd_output_duration_ms += time() - start_time
-
+                fd_duration, coords = run_pipeline(fd_infer_network, frame, fd_duration)
                 num_detections = len(coords)
-
                 ### Execute the pipeline only if one face is in the frame
                 if num_detections == 1:
                     too_many = False
@@ -313,39 +319,17 @@ def infer_on_stream(args):
                     #frame = draw_box(frame,(orig_x, orig_y), (x_max, y_max))
                     cropped_frame = frame[orig_y:y_max, orig_x:x_max]
 
-                    #facial landmar detection preprocess the input
-                    start_time = time()
-                    frame_for_input = fl_infer_network.preprocess_input(cropped_frame)
-                    fl_input_duration_ms += time() - start_time
-
-                    #Run landmarks inference synchronously
-                    start_time = time()
-                    fl_infer_network.sync_infer(frame_for_input)
-                    fl_infer_duration_ms += time() - start_time
-
-                    start_time = time()
-                    landmarks = fl_infer_network.preprocess_output()
+                    #facial landmark detection preprocess the input
+                    fl_duration, landmarks = run_pipeline(fl_infer_network, cropped_frame, fl_duration)
                     scaled_lm = scale_landmarks(landmarks=landmarks[0], image_shape=cropped_frame.shape, orig=(orig_x, orig_y))
-                    fl_output_duration_ms += time() - start_time
 
                     #Send cropped frame to head pose estimation
-                    start_time = time()
-                    frame_for_input = hp_infer_network.preprocess_input(cropped_frame)
-                    hp_input_duration_ms += time() - start_time
+                    hp_duration, hp_angles = run_pipeline(hp_infer_network, cropped_frame, hp_duration)
 
-                    #Head pose infer
-                    start_time = time()
-                    hp_infer_network.sync_infer(frame_for_input)
-                    hp_infer_duration_ms += time() - start_time
-
-                    start_time = time()
-                    y, p, r = hp_infer_network.preprocess_output()
-                    hp_output_duration_ms += time() - start_time
-
-                    input_duration, predict_duration, output_duration, gaze = ge_infer_network.predict(face_image=frame, landmarks=scaled_lm, head_pose_angles=[[y, p, r]])
-                    ge_input_duration_ms += input_duration
-                    ge_infer_duration_ms += predict_duration
-                    ge_output_duration_ms += output_duration
+                    input_duration, predict_duration, output_duration, gaze = ge_infer_network.sync_infer(face_image=frame, landmarks=scaled_lm, head_pose_angles=[hp_angles])
+                    ge_duration['input'] += input_duration
+                    ge_duration['infer'] += predict_duration
+                    ge_duration['output'] += output_duration
                     #Move the   mouse cursor
 
                     mc.move(gaze[0][0], gaze[0][1])
@@ -370,12 +354,18 @@ def infer_on_stream(args):
             if args.benchmark:
                 rt_df = pd.DataFrame.from_dict(runtime, orient='index', columns=["Total runtime"])
                 rt_df["Average runtime/frame"] = rt_df["Total runtime"]/frame_count
-                metric_columns=np.array([[fd_load_duration_ms*1000, fl_load_duration_ms*1000, hp_load_duration_ms*1000, ge_load_duration_ms*1000],
-                            [fd_input_duration_ms*1000, fl_input_duration_ms*1000, hp_input_duration_ms*1000, ge_input_duration_ms*1000],
-                            [fd_infer_duration_ms*1000, None, None, ge_infer_duration_ms*1000],
-                            [fd_output_duration_ms*1000, fl_output_duration_ms*1000, hp_output_duration_ms*1000, ge_output_duration_ms*1000]
-                            ]).T
-                total_df.loc(axis=0)[:,precision] = metric_columns
+                #metric_columns=np.array([[fd_duration['load']*1000, fl_duration['load']*1000, hp_duration['load']*1000, ge_duration['load']*1000],
+                            # [fd_duration['input']*1000, fl_duration['input']*1000, hp_duration['input']*1000, ge_duration['input']*1000],
+                            # [fd_duration['infer']*1000, fl_duration['infer']*1000, hp_duration['infer']*1000, ge_duration['infer']*1000],
+                            # [fd_duration['output']*1000, fl_duration['output']*1000, hp_duration['output']*1000, ge_duration['output']*1000]
+                            # ]).T
+                print(enumerate(fd_duration))
+                for i, (key, value) in enumerate(fd_duration.items()):
+                    print("key {}, value {}".format(key, value))
+                    total_df.loc(axis=0)[:,precision][key] = value*1000
+
+                #metric_columns = [fd_duration, fl_duration, hp_duration, ge_duration]
+                #total_df.loc(axis=0)[:,precision] = metric_columns
 
         ### End For Loop
         cap.release()
@@ -393,9 +383,9 @@ def infer_on_stream(args):
             rt_df = pd.DataFrame.from_dict(runtime, orient='index', columns=["Total runtime"])
             rt_df["Average runtime/frame"] = rt_df["Total runtime"]/frame_count
             metric_columns=np.array([[fd_load_duration_ms*1000, fl_load_duration_ms*1000, hp_load_duration_ms*1000, ge_load_duration_ms*1000],
-                        [fd_input_duration_ms*1000, fl_input_duration_ms*1000, hp_input_duration_ms*1000, ge_input_duration_ms*1000],
-                        [fd_infer_duration_ms*1000, None, None, ge_infer_duration_ms*1000],
-                        [fd_output_duration_ms*1000, fl_output_duration_ms*1000, hp_output_duration_ms*1000, ge_output_duration_ms*1000]
+                        [fd_duration['input']*1000, fl_input_duration_ms*1000, hp_input_duration_ms*1000, ge_input_duration_ms*1000],
+                        [fd_duration['infer']*1000, None, None, ge_infer_duration_ms*1000],
+                        [fd_duration['output']*1000, fl_output_duration_ms*1000, hp_output_duration_ms*1000, ge_output_duration_ms*1000]
                         ]).T
             total_df.loc(axis=0)[:,precision] = metric_columns
             output_bm(args, total_df, rt_df, frame_count)

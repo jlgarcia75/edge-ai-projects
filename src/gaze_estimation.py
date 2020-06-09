@@ -55,7 +55,18 @@ class GazeEstimation:
 
         return duration_ms
 
-    def predict(self, face_image, landmarks, head_pose_angles):
+    #def predict(self, image, conf_threshold=0.3):
+    #        '''
+    #        TODO: This method needs to be completed by you
+    #        Returns: Duration of inference time, new image with detections
+    #        '''
+    #        #Run Inference
+    #        self.exec_net.start_async(request_id=0,inputs={self.input_name:image})
+    #        return
+
+
+        #Synchronous infer
+    def sync_infer(self, face_image, landmarks, head_pose_angles):
         '''
         TODO: This method needs to be completed by you
         Returns: Duration of input processing time, inference time, gaze vector

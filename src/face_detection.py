@@ -12,11 +12,12 @@ class FaceDetection:
     '''
     Class for the Face Detection Model.
     '''
-    def __init__(self, dev, ext=None):
+    def __init__(self, dev, ext=None, threshold=None):
         self.model = None
         self.core = None
         self.device = dev
         self.extensions= ext
+        self.threshold = threshold
 
 
     def load_model(self, dir, name):
@@ -57,10 +58,13 @@ class FaceDetection:
         Returns: Duration of inference time, new image with detections
         '''
         #Run Inference
-        self.exec_net.infer({self.input_name:image})
+        self.exec_net.start_async(request_id=0,inputs={self.input_name:image})
         return
 
 
+    #Synchronous infer
+    def sync_infer(self, image):
+        self.exec_net.infer({self.input_name:image})
 
     def check_model(self):
         '''
@@ -98,7 +102,7 @@ class FaceDetection:
 
         return new_image
 
-    def preprocess_output(self, threshold=0.3):
+    def preprocess_output(self):
         '''
         TODO: This method needs to be completed by you
         Creates array of box coordinates from outputs
@@ -109,7 +113,7 @@ class FaceDetection:
         coords = []
         for box in outputs[0][0]:
             _, _, conf, x_min, y_min, x_max, y_max = box
-            if conf >= float(threshold):
+            if conf >= float(self.threshold):
                 coords.append([x_min, y_min, x_max, y_max])
 
         return coords
