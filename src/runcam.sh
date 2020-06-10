@@ -7,8 +7,7 @@ python main.py -i 0 \
 	-hpm ../models/intel/head-pose-estimation-adas-0001 \
 	-gem ../models/intel/gaze-estimation-adas-0002 \
 	-d ${DEVICE} \
-	-pt 0.3 \
-	-bm True \
-	-sv False \
-	-nf 50 \
+	-ct 0.3 \
+	-bm False \
+	-sv True \
 	-p ${PRECISION}

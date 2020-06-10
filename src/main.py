@@ -24,9 +24,6 @@ import numpy as np
 from sys import exit
 from datetime import datetime
 import time
-#from face_detection import FaceDetection
-#from facial_landmarks import FacialLandmarks
-#from head_pose import HeadPose
 from model_base import ModelBase
 from gaze_estimation import GazeEstimation
 from mouse_controller import MouseController
@@ -34,8 +31,8 @@ from MediaReader import MediaReader
 from signal import SIGINT, signal
 from argparse import ArgumentParser
 from sys import platform
-#from matplotlib import pyplot as pl
 import os
+
 
 
 # Get correct CPU extension
@@ -48,6 +45,8 @@ elif platform == "win32":
 else:
     print("Unsupported OS.")
     exit(1)
+
+model_names = {'fd':'facial detection', 'fl': 'landmark detection', 'hp': 'head pose', 'ge':'gaze estimation'}
 
 def build_argparser():
     """
@@ -170,6 +169,7 @@ def run_pipeline(network, input_image, duration):
     return duration, output
 
 def output_bm(args, t_df, r_df, frames):
+    t_df=t_df*1000 #Convert to (ms)
     avg_df = t_df/frames
     now = datetime.now()
     print("OpenVINO Results")
@@ -212,19 +212,19 @@ def infer_on_stream(args):
 
 
          # Initialize the classes
-        fd_infer_network = ModelBase(name='face detection', dev=args.device, ext=args.cpu_extension, threshold=args.conf_threshold)
-        fl_infer_network = ModelBase(name = 'landmark detection', dev=args.device, ext=args.cpu_extension)
-        hp_infer_network = ModelBase(name = 'head pose', dev=args.device, ext=args.cpu_extension)
-        ge_infer_network = GazeEstimation(name = 'gaze estimation',dev=args.device, ext=args.cpu_extension)
+        fd_infer_network = ModelBase(name=model_names['fd'], dev=args.device, ext=args.cpu_extension, threshold=args.conf_threshold)
+        fl_infer_network = ModelBase(name = model_names['fl'], dev=args.device, ext=args.cpu_extension)
+        hp_infer_network = ModelBase(name = model_names['hp'], dev=args.device, ext=args.cpu_extension)
+        ge_infer_network = GazeEstimation(name = model_names['ge'],dev=args.device, ext=args.cpu_extension)
 
         precisions=args.precisions.split(",")
 
-        if args.benchmark:
-            columns=['load','input','infer','output']
-            model_indeces=[fd_infer_network.short_name, fl_infer_network.short_name, hp_infer_network.short_name, ge_infer_network.short_name]
-            iterables = [model_indeces,precisions]
-            index = pd.MultiIndex.from_product(iterables, names=['Model','Precision'])
-            total_df = pd.DataFrame(np.zeros((len(model_indeces)*len(precisions),len(columns)), dtype=float),index=index, columns=columns)
+
+        columns=['load','input','infer','output']
+        model_indeces=[fd_infer_network.short_name, fl_infer_network.short_name, hp_infer_network.short_name, ge_infer_network.short_name]
+        iterables = [model_indeces,precisions]
+        index = pd.MultiIndex.from_product(iterables, names=['Model','Precision'])
+        total_df = pd.DataFrame(np.zeros((len(model_indeces)*len(precisions),len(columns)), dtype=float),index=index, columns=columns)
 
         flip=False
 
@@ -241,7 +241,7 @@ def infer_on_stream(args):
             cv2.startWindowThread()
             cv2.namedWindow("Out")
             cv2.moveWindow("Out", int((screenWidth-frame_width)/2), int((screenHeight+frame_height)/2))
-        mc.put(int(screenWidth/2), int(screenHeight/2)) #Place the mouse cursor in the center of the screen
+
         # Process frames until the video ends, or process is exited
         ### TODO: Load the models through `infer_network` ###
         print("Video being shown: ", str(args.showvideo))
@@ -249,6 +249,7 @@ def infer_on_stream(args):
         runtime={}
         for precision in precisions:
             print("Beginning test for precision {}.".format(precision))
+            mc.put(int(screenWidth/2), int(screenHeight/2)) #Place the mouse cursor in the center of the screen
             frame_count=0
             runtime_start = time.perf_counter()
             #fd_dir = os.path.join(args.fd_model, precision)
@@ -299,6 +300,7 @@ def infer_on_stream(args):
                     not_enough = False
                     if not single:
                         text="I see you. Move the mouse cursor with your eyes."
+                        print(text)
                         single=True
 
                     x_min, y_min, x_max, y_max = coords[0]
@@ -357,12 +359,14 @@ def infer_on_stream(args):
                     not_enough=False
                     if not too_many:
                         text="Too many faces confuse me. I need to see only one face."
+                        print(text)
                         too_many=True
                 else:
                     too_many = False
                     single=False
                     if not not_enough:
                         text="Is there anybody out there?"
+                        print(text)
                         not_enough=True
 
             ## End While Loop
@@ -387,10 +391,9 @@ def infer_on_stream(args):
         #Collect Stats
         print("Detected keyboard interrupt")
         if args.benchmark:
-            if args.benchmark:
-                rt_df = pd.DataFrame.from_dict(runtime, orient='index', columns=["Total runtime"])
-                rt_df['FPS'] = frame_count/rt_df["Total runtime"]
-                output_bm(args, total_df, rt_df, frame_count)
+            rt_df = pd.DataFrame.from_dict(runtime, orient='index', columns=["Total runtime"])
+            rt_df['FPS'] = frame_count/rt_df["Total runtime"]
+            output_bm(args, total_df, rt_df, frame_count)
         leave_program()
     except Exception as e:
          print("Exception: ",e)

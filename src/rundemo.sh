@@ -9,6 +9,6 @@ python main.py -i ../bin/demo.mp4 \
 	-d ${DEVICE} \
 	-bm True \
 	-sv True \
-	-pt 0.3 \
+	-ct 0.3 \
 	-p ${PRECISION} \
-	-nf 60
+	-nf 5

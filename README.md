@@ -12,7 +12,7 @@ This is the third project for the Udacity course Intel® Edge AI for IoT Develop
 ### Setup
 1.  Clone git into your working directory.
 2.  Source the OpenVINO environment.
-3.  
+3.
 
 
 ## Demo
@@ -26,7 +26,7 @@ Two scripts are provided that will run the project with a sample demo video or w
 
 ## Documentation
 The program has many command line arguments that allow you to customize how it runs.
-
+```
 usage: main.py [-h] -i INPUT [-p PRECISIONS] [-fdm FD_MODEL] [-flm FL_MODEL]
                [-hpm HP_MODEL] [-gem GE_MODEL] [-l CPU_EXTENSION] [-d DEVICE]
                [-pt PROB_THRESHOLD] [-bm BENCHMARK] [-nf NUM_FRAMES]
@@ -81,7 +81,7 @@ optional arguments:
   -async ASYNCINFER, --asyncinfer ASYNCINFER
                         Run asynchronouse inference landmarks and head pose
                         models? True|False. (True by default)
-
+```
 ## Benchmarks
 
 
@@ -89,7 +89,12 @@ optional arguments:
 *TODO:* Discuss the benchmark results and explain why you are getting the results you are getting. For instance, explain why there is difference in inference time for FP32, FP16 and INT8 models.
 
 ## Stand Out Suggestions
-This is where you can provide information about the stand out suggestions that you have attempted.
+### Number of faces detections
+The program works only when a single face is detected in the input. When more than one face is detected, a message shows in the video saying
+
+* One face, process: "I see you. Move the mouse cursor with your eyes."
+* More than one face, do not process: "Too many faces confuse me. I need to see only one face."
+* No faces, do not process: "Is there anybody out there?"
 
 ### Async Inference
 If you have used Async Inference in your code, benchmark the results and explain its effects on power and performance of your project.
