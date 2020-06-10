@@ -12,12 +12,13 @@ class ModelBase:
     '''
     Class for the Face Detection Model.
     '''
-    def __init__(self, dev, ext=None, threshold=None):
+    def __init__(self, name, dev, ext=None, threshold=None):
         self.model = None
         self.core = None
         self.device = dev
         self.extensions= ext
         self.threshold = threshold
+        self.short_name = name
 
 
     def load_model(self, dir, name):
@@ -37,12 +38,12 @@ class ModelBase:
         self.input_shape=self.model.inputs[self.input_name].shape
         self.output_name=next(iter(self.model.outputs))
 
-        start_time = time.time()
+        start_time = time.perf_counter()
         self.core = IECore()
         #Check for unsupported layers
         self.check_model()
         self.exec_net = self.core.load_network(self.model, self.device, num_requests=0)
-        duration_ms = time.time() - start_time
+        duration_ms = time.perf_counter() - start_time
         # Add an extension, if applicable
         if self.extensions:
             self.core.add_extension(self.extensions, self.device)
@@ -61,7 +62,7 @@ class ModelBase:
     def wait(self):
     ### Wait for the request to be complete. ###
         return self.exec_net.requests[0].wait()
-        
+
     #Synchronous infer
     def sync_infer(self, image):
         self.exec_net.infer({self.input_name:image})

@@ -24,11 +24,5 @@ class MouseController:
     def monitor(self):
         return pyautogui.size()
 
-    def position(self):
-        return pyautogui.position()
-
     def put(self, x, y):
         pyautogui.moveTo(x, y)
-
-    def onscreen(self, x, y):
-        pyautogui.onScreen(x, y)

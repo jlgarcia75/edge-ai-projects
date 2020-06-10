@@ -12,7 +12,7 @@ class GazeEstimation:
     '''
     Class for the Face Detection Model.
     '''
-    def __init__(self, dev, ext=None):
+    def __init__(self, name, dev, ext=None):
         self.model = None
         self.core = None
         self.device=dev
@@ -20,7 +20,7 @@ class GazeEstimation:
         self.left_eye_input = 'left_eye_image'
         self.right_eye_input = 'right_eye_image'
         self.head_pose_input = 'head_pose_angles'
-
+        self.short_name = name
 
     def load_model(self, dir, name):
         '''
@@ -40,7 +40,7 @@ class GazeEstimation:
         self.output_name=next(iter(self.model.outputs))
         self.output_shape=self.model.outputs[self.output_name].shape
 
-        start_time = time.time()
+        start_time = time.perf_counter()
         self.core = IECore()
 
         #Check for unsupported layers
@@ -48,7 +48,7 @@ class GazeEstimation:
 
         self.exec_net = self.core.load_network(self.model, self.device, num_requests=0)
 
-        duration_ms = time.time() - start_time
+        duration_ms = time.perf_counter() - start_time
         # Add an extension, if applicable
         if self.extensions:
             self.plugin.add_extension(self.extensions, self.device)
@@ -72,24 +72,24 @@ class GazeEstimation:
         Returns: Duration of input processing time, inference time, gaze vector
         '''
         #Preprocess the input
-        start_time = time.time()
+        start_time = time.perf_counter()
         eye_offset = int(self.eye_shape[2]/2)
         right_eye = landmarks[0]
         left_eye = landmarks[1]
         left_crop = face_image[left_eye[1]-eye_offset:left_eye[1]+eye_offset, left_eye[0]-eye_offset:left_eye[0]+eye_offset]
         right_crop = face_image[right_eye[1]-eye_offset:right_eye[1]+eye_offset, right_eye[0]-eye_offset:right_eye[0]+eye_offset]
         eye_images = list(map(self.preprocess_input,[left_crop, right_crop]))
-        input_duration_ms = time.time() - start_time
+        input_duration_ms = time.perf_counter() - start_time
 
         #Run Inference
-        start_time = time.time()
+        start_time = time.perf_counter()
         self.exec_net.infer({self.left_eye_input:eye_images[0], self.right_eye_input:eye_images[1], self.head_pose_input:head_pose_angles})
-        infer_duration_ms = time.time() - start_time
+        infer_duration_ms = time.perf_counter() - start_time
 
         #Get the outputs
-        start_time = time.time()
+        start_time = time.perf_counter()
         detections = self.exec_net.requests[0].outputs[self.output_name]
-        output_duration_ms = time.time() - start_time
+        output_duration_ms = time.perf_counter() - start_time
 
         return input_duration_ms, infer_duration_ms, output_duration_ms, detections
 
