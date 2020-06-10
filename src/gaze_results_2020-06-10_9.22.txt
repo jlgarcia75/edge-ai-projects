@@ -1,5 +1,5 @@
 
-(base) c:\Users\jlgarci2\Dropbox\github\move-mouse-pointer\src>python main.py -nf 100 -p FP32,FP16 -i ..\bin\demo.mp4 -fdm ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001 -flm ..\models\intel\landmarks-regression-retail-0009 -hpm ..\models\intel\head-pose-estimation-adas-0001 -gem ..\models\intel\gaze-estimation-adas-0002 -d CPU -ct 0.3 -async False -sv False 
+(base) c:\Users\jlgarci2\Dropbox\github\move-mouse-pointer\src>python main.py -nf 100 -p FP32,FP16 -i ..\bin\demo.mp4 -fdm ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001 -flm ..\models\intel\landmarks-regression-retail-0009 -hpm ..\models\intel\head-pose-estimation-adas-0001 -gem ..\models\intel\gaze-estimation-adas-0002 -d CPU -ct 0.3 -async False -sv False
 Video being shown:  False
 Beginning test for precision FP32.
 Completed run for precision FP32.
@@ -18,20 +18,20 @@ FP32     123.695371  0.808438
 FP16     123.438669  0.810119
 
 Total Durations(ms) per phase:
-                                  load     input      infer   output
-Model              Precision                                        
-facial detection   FP32       477.3187  110.8960  1578.3580   8.7551
-                   FP16       253.2533  111.4063  1591.1398   9.6300
-landmark detection FP32       166.1206   10.0438    64.3487   7.2851
-                   FP16       118.2736   10.1416    65.0417   7.4530
-head pose          FP32       125.2244    8.9786   145.4375  12.5562
-                   FP16       137.0907    9.0327   143.3903  11.9578
-gaze estimation    FP32       127.2796    7.5069   154.1379   4.8336
-                   FP16       139.3510    4.4542   154.1262   4.9598
+                                  load  |   input   |   infer  | output
+Model              Precision
+facial detection  | FP32|477.3187  110.8960  1578.3580   8.7551
+                  | FP16 |      253.2533  111.4063  1591.1398   9.6300
+landmark detection| FP32  |     166.1206   10.0438    64.3487   7.2851
+                  | FP16   |    118.2736   10.1416    65.0417   7.4530
+head pose         | FP32    |   125.2244    8.9786   145.4375  12.5562
+                  | FP16     |  137.0907    9.0327   143.3903  11.9578
+gaze estimation   | FP32      | 127.2796    7.5069   154.1379   4.8336
+                  | FP16       | 139.3510    4.4542   154.1262   4.9598
 
 Duration(ms)/Frames per phase:
                                   load     input      infer    output
-Model              Precision                                         
+Model              Precision
 facial detection   FP32       4.773187  1.108960  15.783580  0.087551
                    FP16       2.532533  1.114063  15.911398  0.096300
 landmark detection FP32       1.661206  0.100438   0.643487  0.072851
@@ -46,7 +46,7 @@ gaze estimation    FP32       1.272796  0.075069   1.541379  0.048336
 
 
 
-(base) c:\Users\jlgarci2\Dropbox\github\move-mouse-pointer\src>python main.py -nf 100 -p FP32,FP16 -i ..\bin\demo.mp4 -fdm ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001 -flm ..\models\intel\landmarks-regression-retail-0009 -hpm ..\models\intel\head-pose-estimation-adas-0001 -gem ..\models\intel\gaze-estimation-adas-0002 -d CPU -ct 0.3 -async True -sv False 
+(base) c:\Users\jlgarci2\Dropbox\github\move-mouse-pointer\src>python main.py -nf 100 -p FP32,FP16 -i ..\bin\demo.mp4 -fdm ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001 -flm ..\models\intel\landmarks-regression-retail-0009 -hpm ..\models\intel\head-pose-estimation-adas-0001 -gem ..\models\intel\gaze-estimation-adas-0002 -d CPU -ct 0.3 -async True -sv False
 Video being shown:  False
 Beginning test for precision FP32.
 Completed run for precision FP32.
@@ -66,7 +66,7 @@ FP16     123.447517  0.810061
 
 Total Durations(ms) per phase:
                                   load     input      infer   output
-Model              Precision                                        
+Model              Precision
 facial detection   FP32       276.5253  100.3509  1487.2646   8.8087
                    FP16       277.1853  117.7123  1661.4165   9.6197
 landmark detection FP32       112.1027   44.4284     0.0000  44.9154
@@ -78,7 +78,7 @@ gaze estimation    FP32       123.9540    4.6744   161.2043   5.4730
 
 Duration(ms)/Frames per phase:
                                   load     input      infer    output
-Model              Precision                                         
+Model              Precision
 facial detection   FP32       2.765253  1.003509  14.872646  0.088087
                    FP16       2.771853  1.177123  16.614165  0.096197
 landmark detection FP32       1.121027  0.444284   0.000000  0.449154
@@ -93,7 +93,7 @@ gaze estimation    FP32       1.239540  0.046744   1.612043  0.054730
 
 
 
-(base) c:\Users\jlgarci2\Dropbox\github\move-mouse-pointer\src>python main.py -nf 100 -p FP32,FP16 -i ..\bin\demo.mp4 -fdm ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001 -flm ..\models\intel\landmarks-regression-retail-0009 -hpm ..\models\intel\head-pose-estimation-adas-0001 -gem ..\models\intel\gaze-estimation-adas-0002 -d HETERO:GPU,CPU -ct 0.3 -async False -sv False 
+(base) c:\Users\jlgarci2\Dropbox\github\move-mouse-pointer\src>python main.py -nf 100 -p FP32,FP16 -i ..\bin\demo.mp4 -fdm ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001 -flm ..\models\intel\landmarks-regression-retail-0009 -hpm ..\models\intel\head-pose-estimation-adas-0001 -gem ..\models\intel\gaze-estimation-adas-0002 -d HETERO:GPU,CPU -ct 0.3 -async False -sv False
 conv4_3_0_norm_mbox_loc_perm is GPU
 conv4_3_norm_mbox_loc_perm is GPU
 fc7_mbox_loc_perm is GPU
@@ -429,7 +429,7 @@ FP16     158.048177  0.632718
 
 Total Durations(ms) per phase:
                                     load     input      infer   output
-Model              Precision                                          
+Model              Precision
 facial detection   FP32       22317.1596  116.8904  2090.5380  10.1817
                    FP16       20608.3234  137.5879  2111.7795  10.3625
 landmark detection FP32        3691.4430   11.3018   180.6220   8.2680
@@ -441,7 +441,7 @@ gaze estimation    FP32        5461.2131    5.2269   265.3656   5.1601
 
 Duration(ms)/Frames per phase:
                                     load     input      infer    output
-Model              Precision                                           
+Model              Precision
 facial detection   FP32       223.171596  1.168904  20.905380  0.101817
                    FP16       206.083234  1.375879  21.117795  0.103625
 landmark detection FP32        36.914430  0.113018   1.806220  0.082680
@@ -456,7 +456,7 @@ gaze estimation    FP32        54.612131  0.052269   2.653656  0.051601
 
 
 
-(base) c:\Users\jlgarci2\Dropbox\github\move-mouse-pointer\src>python main.py -nf 100 -p FP32,FP16 -i ..\bin\demo.mp4 -fdm ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001 -flm ..\models\intel\landmarks-regression-retail-0009 -hpm ..\models\intel\head-pose-estimation-adas-0001 -gem ..\models\intel\gaze-estimation-adas-0002 -d HETERO:GPU,CPU -ct 0.3 -async True -sv False 
+(base) c:\Users\jlgarci2\Dropbox\github\move-mouse-pointer\src>python main.py -nf 100 -p FP32,FP16 -i ..\bin\demo.mp4 -fdm ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001 -flm ..\models\intel\landmarks-regression-retail-0009 -hpm ..\models\intel\head-pose-estimation-adas-0001 -gem ..\models\intel\gaze-estimation-adas-0002 -d HETERO:GPU,CPU -ct 0.3 -async True -sv False
 conv4_3_0_norm_mbox_loc_perm is GPU
 conv4_3_norm_mbox_loc_perm is GPU
 fc7_mbox_loc_perm is GPU
@@ -792,7 +792,7 @@ FP16     158.315022  0.631652
 
 Total Durations(ms) per phase:
                                     load     input      infer   output
-Model              Precision                                          
+Model              Precision
 facial detection   FP32       21326.6917  121.2836  2122.4262  10.1803
                    FP16       21020.6454  134.9714  2189.1834  10.2359
 landmark detection FP32        3708.6516   52.7991     0.0000  63.4272
@@ -804,7 +804,7 @@ gaze estimation    FP32        5310.4178    5.5606   264.9415   5.1436
 
 Duration(ms)/Frames per phase:
                                     load     input      infer    output
-Model              Precision                                           
+Model              Precision
 facial detection   FP32       213.266917  1.212836  21.224262  0.101803
                    FP16       210.206454  1.349714  21.891834  0.102359
 landmark detection FP32        37.086516  0.527991   0.000000  0.634272
@@ -815,6 +815,3 @@ gaze estimation    FP32        53.104178  0.055606   2.649415  0.051436
                    FP16        54.031593  0.052428   2.437323  0.047677
 
 *********************************************************************************
-
-
-
