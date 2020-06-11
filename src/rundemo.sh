@@ -11,4 +11,4 @@ python main.py -i ../bin/demo.mp4 \
 	-sv True \
 	-ct 0.3 \
 	-p ${PRECISION} \
-	-nf 5
+	-nf 100

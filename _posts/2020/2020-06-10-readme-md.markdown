@@ -2,6 +2,8 @@
 layout: post
 title: README.md
 date: '2020-06-10 19:04'
+tags:
+  - mouse da
 ---
 
 # Computer Pointer Controller
@@ -20,21 +22,60 @@ When the program starts, a window showing the input video appears in the middle 
 ### Setup
 1.  Clone git into your working directory.
 2.  Source the OpenVINO environment.
-3.
 
+### Directory structure
+```
+<download dir>
+  src/source Files
+  bin/demo.mp4 video file
+  models/intel/<model name>/<precision>/<modelname .bin and .xml>
+  ```
+### Model Inputs
+When specifying the model directories with the -flm, -hpm, and -gem flags you must provide a directory path that ends with the model name just above the <precision>. When you specify the precision you want to load using the -p flag, the precision will be concatenated to the model path to get to the model files.
+
+For example, the arguments ```-flm ../models/intel/landmarks-regression-retail-0009 -p FP32 ``` will get the .bin and .xml model files from ```../models/intel/landmarks-regression-retail-0009/FP32/landmarks-regression-retail-0009.bin and .xml```
+
+This repository provides the necessary models but if you want to download the models yourself you can do so with:
+
+```
+Face Detection
+/opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name face-detection-adas-binary-0001 -o ./models/
+
+Head Pose Estimation
+/opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name head-pose-estimation-adas-0001 -o ./models/
+
+Facial Landmarks Detection
+/opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name landmarks-regression-retail-0009 -o ./models/
+
+Gaze Estimation
+/opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name gaze-estimation-adas-0002 -o ./models/
+```
 
 ## Demo
-Two scripts are provided that will run the project with a sample demo video or with your webcam.
-### Linux or MacOS
-  * rundemo.sh
-  * runcam.sh
-### Windows
-  * rundemo.bat
-  * runcam.bat
+Several scripts for both Linux/MacOS (.sh files) and Windows (.bat files) are provided that will run the project with common configurations.
+
+Take a look at
+```
+rundemo.sh
+runcam.sh
+```
+and their equivalent files for Windows with ```.bat``` extensions.
+
+For an easy run with an input video:
+```
+$ source /opt/intel/openvino/bin/setupvars.sh
+$ cd src
+$ python main.py -i ../bin/demo.mp4
+```
+
+This will run the program on ![demo.mp4](./bin/demo.mp4) for 100 frames. To run the whole video, specify ```-nf 600``` or higher.
+
+To run the camera with webcam input:
+```$ python main.py -i 0```
 
 ## Documentation
 The program has many command line arguments that allow you to customize how it runs.
-We recommend
+
 ```python
 usage: main.py [-h] -i INPUT [-p PRECISIONS] [-fdm FD_MODEL] [-flm FL_MODEL]
                [-hpm HP_MODEL] [-gem GE_MODEL] [-l CPU_EXTENSION] [-d DEVICE]
@@ -95,34 +136,63 @@ optional arguments:
                         default)
 ```
 ## Benchmarks
+Please see ![gaze results](./gaze_results_2020_06_10_6.47.txt) for detailed benchmark data.
 
-
-Please see ![gaze results](./gaze_results_2020_06_10_9.22.txt) for detailed benchmark data.
+The script that runs the benchmarks on Windows is ![runbenchmarks.bat](./runbenchmarks.bat).
 
 
 ## Results
-Benchmarks were gathered across eight separate runs of the program. The configurations were:
-1. Device: CPU; Inference Type: Asynchronous; Precision: FP32
-2. Device: CPU; Inference Type: Synchronous, Precision:FP32
-3. Device: CPU; Inference Type: Asynchronous, Precision:FP16
-4. Device: CPU; Inference Type: Synchronous, Precision:FP16
-5. Device: HETERO:GPU,CPU; Inference Type: Asynchronous, Precision:FP32
-6. Device: HETERO:GPU,CPU; Inference Type: Synchronous, Precision:FP32
-7. Device: HETERO:GPU,CPU; Inference Type: Asynchronous, Precision:FP16
-6. HETERO:GPU,CPU; Inference Type: Synchronous, Precision: FP16
+
+### System Information
+Processor	Intel(R) Core(TM) i5-8350U CPU @ 1.70GHz, 1896 Mhz, 4 Core(s), 8 Logical Processor(s)
+System Model	HP EliteBook 850 G5
+Windows 10 Enterprise Version	10.0.17763 Build 17763
+Installed Physical Memory (RAM)	16.0 GB
+Intel(R) UHD Graphics 620
+
+### Configurations
+Performance metrics were gathered across 12 separate runs of the program. The configurations were:
 
 Device  | Inference Type  |  Precision
 --|---|--
 CPU  | Asynchronous|  FP32
 CPU  | Synchronous |  FP32
 CPU  | Asynchronous| FP16
-CPU  | Synchronous |  FP32
+CPU  | Synchronous |  FP16
+CPU  | Asynchronous| FP32-INT8
+CPU  | Synchronous |  FP32-INT8
 HETERO:GPU,CPU  |Asynchronous| FP32
 HETERO:GPU,CPU  |Synchronous | FP32
 HETERO:GPU,CPU  |Asynchronous| FP16
 HETERO:GPU,CPU  |Synchronous | FP16
+HETERO:GPU,CPU  |Asynchronous| FP32-INT8
+HETERO:GPU,CPU  |Synchronous | FP32-INT8
 
 Each run was done on the first 100 frames of the video ![demo.mp4](./bin/demo.mp4).
+
+### Metrics
+The performance metrics are:
+Total runtime
+Total FPS
+Duration for each phase of model execution: load model, pre-process input, infer, get outputs
+
+And the winners are...
+The configuration with the shortest total runtime for 100 frames is:
+*CPU - Synchronous Inference - FP32* with a total runtime of 140.54 seconds and .71 FPS.
+
+However, there was not a signifant difference in total runtimes because the runtime was dominated by the mouse movement function call.
+
+The shortest inference times per model were:
+Face Detection: 12.54ms/frame with CPU, Synchronous, FP16
+Landmark Detection: .59ms/frame with CPU, Synchronous, FP16
+Head Pose: 1.03ms/frame with CPU,Synchronous, FP32-INT8
+Gaze Estimation: 1.09ms/frame with CPU, Synchronous, FP32-INT8
+
+### GPU vs CPU
+The inference times on GPU were always at least 50% slower than on CPU.
+
+The model load times on GPU were 10X slower than on CPU.
+
 
 ### Asynchronous vs. Synchronous Inferencing
 Asynchronous inferencing makes sense when unrelated tasks can be done in parallel. For example, an asynchronous inference can be started for two models who work on data indepedently and don't depend on each other's outputs. While there are many opportunities for parallelism in this program, I chose the simplest one and most obvious one.
@@ -135,6 +205,8 @@ Truely asynchronous inferencing is done by running an unrelated task right after
 3. When the result from an async job is needed, call blocking function Wait() to wait for the results to be available. This is the point where processing cannot proceed without the results from the async inference job. A callback function can also be set that gets called when the inference task is finished. In my code, I used the wait() function instead of the callback.
 
 Due to the indeterminate length of unrelated tasks in Step 2 above, it does not make sense to measure the time between when the asynchronous job begins and when the results are gathered. The asynchronous results could be available any time while the unrelated tasks are running and this time is not captured. For this reason, you will find that in the ASYNC INFER tests the inference time for Landmarks and Head Pose is zero, since it was not measured.
+
+If done right by taking advantage of parallelism, asynchronous inferencing can perform better than synchronous inferencing.
 
 In the ASYNC INFER tests, the models were configured as such:
 Facial Detection - Synchronous inference. Reasoning: No job could be run in parallel. Next phase in pipeline could not start until facial detection was completed.
@@ -150,44 +222,42 @@ Landmark Detection: FP32, FP16, FP32-INT8
 Head Pose: FP32, FP16, FP32-INT8
 Gaze Estimation: FP32, FP16, FP32-INT8
 
-Benchmarks were run only for FP32 and FP16. Since the only available precision for Face Detection is FP32-INT1, this precision was used for both FP32 and FP16 runs. In the results, you will see FP32 and FP16 next to Face Detection but don't be confused, these were both run with the same model at FP32-INT1.
+ Since the only available precision for Face Detection is FP32-INT1, this precision was used for all runs. In the results, you will see FP32, FP16, and FP32-INT8 next to Face Detection but don't be confused, these were all run with the same model at FP32-INT1.
 
+### FP32 vs FP16
+One would think that the load times of the FP32 models would be much slower than the load times for the FP16 but the data shows the opposite is true for my tests on CPU. For example,
+```
+Landmark Detection load time for FP32 on CPU: 112.46ms
+Landmark Detection load time for FP16 on CPU: 137.33ms
+```
 
-### Total runtime analysis
-Config  |  Total runtime(s) |  FPS |
---|---|---|--
-SYNC INFER - CPU - FP32  | 123.695371  | 0.808438  |
-SYNC INFER - CPU - FP16|  123.438669 | 0.810119  |
-ASYNC INFER - CPU - FP32  |  123.135343 |  0.812115 |
-ASYNC INFER - CPU - FP16  | 123.447517  | 0.810061  |
-SYNC INFER - GPU,CPU - FP32  | 160.078532  | 0.624693  |
-SYNC INFER - GPU,CPU - FP16|  158.048177 | 0.632718  |
-ASYNC INFER - GPU,CPU - FP32  | 158.475282  |  0.631013 |
-ASYNC INFER - GPU,CPU - FP16  |  158.315022 | 0.631652  |
-
-
-The results above show that the total runtime when the GPU was used was longer than when only the CPU was used. The program was not tested on MYRIAD because the models could not be loaded onto the NCS2.
-
-There was not a signifant difference in total runtimes because the runtime was dominated by the mouse movement function call.
-### Load Time Analysis
-FP32 models are about twice as large as FP16 models because the FP32 data is 4 bytes long while FP16 data is 2 bytes long.
-
-
+However, on GPU,CPU, the behavior is as we expect but not by much
+```
+Landmark Detection load time for FP32 on GPU,CPU: 3620.16ms
+Landmark Detection load time for FP16 on GPU,CPU: 3302.29ms
+```
 
 ## Stand Out Suggestions
-### Number of faces detections
-
-
 ### Async Inference
 If you have used Async Inference in your code, benchmark the results and explain its effects on power and performance of your project.
 
 ### Edge Cases
+#### Number of faces detections
 The program works only when a single face is detected in the input. When more than one face is detected, a message shows in the video, and on the terminal.
 
-* One face: "I see you. Move the mouse cursor with your eyes." * Run inference *
+* One face: "I see you. Move the mouse cursor with your eyes." *Run inference*
 * More than one face: "Too many faces confuse me. I need to see only one face." *Do not run inference*
-* No faces: "Is there anybody out there." * Do not run inference *
+* No faces: "Is there anybody out there." *Do not run inference*
 
 Here is a sample picture with two faces. Notice the text message at the top left of the frame.
 
-![Too many faces](src/too_many.png)
+![Too many faces](./src/too_many.png)
+
+#### Cool Features
+The program has several cool controls from the command line.
+* Use the `-nf num_frames` to control the number of frames to process from both video and camera inputs. Example, `-nf 100` runs the program for 100 frames, then exits.
+* Use `-p <list of precisions>` to specify several precisions to execute sequentially within the same run. The input video starts at frame 0 at the beginning of a new precision run. Try it yourself with `-p FP32,FP16`.
+* Use `-sv False` to not show the video during the run. This way, you will see the mouse moving on the screen without seeing the video itself.
+* Use `-bm True` to display performance data. True is default. Use `-bm False` if you don't want to see the peformance data.
+* Use `-async True|False` to run the Landmark and Head Pose models with or without asynchronous inferencing.
+* Use `-i INPUT` to specify either a video file, an image, your webcam with `-i 0`, or a directory of images by specifying the directory name.
