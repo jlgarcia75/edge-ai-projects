@@ -26,14 +26,18 @@ When the program starts, a window showing the input video appears in the middle 
 ### Directory structure
 ```
 <download dir>
-  src/source Files
-  bin/demo.mp4 video file
+  src/<source files>
+  bin/demo.mp4 <video file>
   models/intel/<model name>/<precision>/<modelname .bin and .xml>
   ```
 ### Model Inputs
 When specifying the model directories with the -flm, -hpm, and -gem flags you must provide a directory path that ends with the model name just above the <precision>. When you specify the precision you want to load using the -p flag, the precision will be concatenated to the model path to get to the model files.
 
 For example, the arguments ```-flm ../models/intel/landmarks-regression-retail-0009 -p FP32 ``` will get the .bin and .xml model files from ```../models/intel/landmarks-regression-retail-0009/FP32/landmarks-regression-retail-0009.bin and .xml```
+
+The only exception is the Face Detection model, face-detection-adas-binary-0001. This model is only available in format FP32-INT1, which is different than the other models. This is the only model for which you have to specify the path including the precision and model name:
+
+```-fdm ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001```
 
 This repository provides the necessary models but if you want to download the models yourself you can do so with:
 
@@ -61,7 +65,8 @@ runcam.sh
 ```
 and their equivalent files for Windows with ```.bat``` extensions.
 
-For an easy run with an input video:
+The only required argument is the ```-i``` argument to specify the input. All other arguments are optional and have default values. For an easy run with an input video:
+
 ```
 $ source /opt/intel/openvino/bin/setupvars.sh
 $ cd src
@@ -73,10 +78,11 @@ This will run the program on ![demo.mp4](./bin/demo.mp4) for 100 frames. To run 
 To run the camera with webcam input:
 ```$ python main.py -i 0```
 
+
 ## Documentation
 The program has many command line arguments that allow you to customize how it runs.
 
-```python
+```
 usage: main.py [-h] -i INPUT [-p PRECISIONS] [-fdm FD_MODEL] [-flm FL_MODEL]
                [-hpm HP_MODEL] [-gem GE_MODEL] [-l CPU_EXTENSION] [-d DEVICE]
                [-ct CONF_THRESHOLD] [-bm BENCHMARK] [-nf NUM_FRAMES]
@@ -144,11 +150,11 @@ The script that runs the benchmarks on Windows is ![runbenchmarks.bat](./runbenc
 ## Results
 
 ### System Information
-Processor	Intel(R) Core(TM) i5-8350U CPU @ 1.70GHz, 1896 Mhz, 4 Core(s), 8 Logical Processor(s)
-System Model	HP EliteBook 850 G5
-Windows 10 Enterprise Version	10.0.17763 Build 17763
-Installed Physical Memory (RAM)	16.0 GB
-Intel(R) UHD Graphics 620
+- Processor	Intel(R) Core(TM) i5-8350U CPU @ 1.70GHz, 1896 Mhz, 4 Core(s), 8 Logical Processor(s)
+- System Model	HP EliteBook 850 G5
+- Windows 10 Enterprise Version	10.0.17763 Build 17763
+- Installed Physical Memory (RAM)	16.0 GB
+- Intel(R) UHD Graphics 620
 
 ### Configurations
 Performance metrics were gathered across 12 separate runs of the program. The configurations were:
@@ -172,8 +178,8 @@ Each run was done on the first 100 frames of the video ![demo.mp4](./bin/demo.mp
 
 ### Metrics
 The performance metrics are:
-Total runtime
-Total FPS
+- Total runtime
+- Total FPS
 Duration for each phase of model execution: load model, pre-process input, infer, get outputs
 
 And the winners are...
@@ -183,10 +189,10 @@ The configuration with the shortest total runtime for 100 frames is:
 However, there was not a signifant difference in total runtimes because the runtime was dominated by the mouse movement function call.
 
 The shortest inference times per model were:
-Face Detection: 12.54ms/frame with CPU, Synchronous, FP16
-Landmark Detection: .59ms/frame with CPU, Synchronous, FP16
-Head Pose: 1.03ms/frame with CPU,Synchronous, FP32-INT8
-Gaze Estimation: 1.09ms/frame with CPU, Synchronous, FP32-INT8
+- Face Detection: 12.54ms/frame with CPU, Synchronous, FP16
+- Landmark Detection: .59ms/frame with CPU, Synchronous, FP16
+- Head Pose: 1.03ms/frame with CPU,Synchronous, FP32-INT8
+- Gaze Estimation: 1.09ms/frame with CPU, Synchronous, FP32-INT8
 
 ### GPU vs CPU
 The inference times on GPU were always at least 50% slower than on CPU.
@@ -217,10 +223,10 @@ Gaze Estimation - Synchronous Inference. Reasoning: No job could be run in paral
 In the SYNC INFER tests, all models were run with synchronous inferencing so all models had their inference times measured.
 
 ### Available Model Precisions
-Face Detection: FP32-INT1
-Landmark Detection: FP32, FP16, FP32-INT8
-Head Pose: FP32, FP16, FP32-INT8
-Gaze Estimation: FP32, FP16, FP32-INT8
+- Face Detection: FP32-INT1
+- Landmark Detection: FP32, FP16, FP32-INT8
+- Head Pose: FP32, FP16, FP32-INT8
+- Gaze Estimation: FP32, FP16, FP32-INT8
 
  Since the only available precision for Face Detection is FP32-INT1, this precision was used for all runs. In the results, you will see FP32, FP16, and FP32-INT8 next to Face Detection but don't be confused, these were all run with the same model at FP32-INT1.
 
