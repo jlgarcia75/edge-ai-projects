@@ -146,9 +146,9 @@ optional arguments:
                         default)
 ```
 ## Benchmarks
-Please see ![gaze results](./src/gaze_results_2020_06_10_6.47.txt) for detailed benchmark data.
+Please see ![gaze results](./src/gaze_benchmark_2020_06_10_6.47.txt) for detailed benchmark data.
 
-The script that runs the benchmarks on Windows is ![runbenchmarks.bat](./src/runbenchmarks.bat).
+The script that runs the benchmarks on Windows is ![runbenchmarks.bat](./src/runbenchmark.bat).
 
 
 ## Results
