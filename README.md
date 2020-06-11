@@ -146,9 +146,9 @@ optional arguments:
                         default)
 ```
 ## Benchmarks
-Please see ![gaze results](./gaze_results_2020_06_10_6.47.txt) for detailed benchmark data.
+Please see ![gaze results](./src/gaze_results_2020_06_10_6.47.txt) for detailed benchmark data.
 
-The script that runs the benchmarks on Windows is ![runbenchmarks.bat](./runbenchmarks.bat).
+The script that runs the benchmarks on Windows is ![runbenchmarks.bat](./src/runbenchmarks.bat).
 
 
 ## Results
@@ -218,7 +218,7 @@ Truely asynchronous inferencing is done by running an unrelated task right after
 
 Due to the indeterminate length of unrelated tasks in Step 2 above, it does not make sense to measure the time between when the asynchronous job begins and when the results are gathered. The asynchronous results could be available any time while the unrelated tasks are running and this time is not captured. For this reason, you will find that in the ASYNC INFER tests the inference time for Landmarks and Head Pose is zero, since it was not measured.
 
-If done right by taking advantage of parallelism, asynchronous inferencing can perform better than synchronous inferencing.
+If done right by taking advantage of parallelism, asynchronous inferencing can perform better than synchronous inferencing. Due to more efficient use of resources, asynchronous inferencing can be faster and use less power.
 
 In the ASYNC INFER tests, the models were configured as such:
 - Facial Detection - Synchronous inference. Reasoning: No job could be run in parallel. Next phase in pipeline could not start until facial detection was completed.
@@ -250,9 +250,6 @@ Landmark Detection load time for FP16 on GPU,CPU: 3302.29ms
 ```
 
 ## Stand Out Suggestions
-### Async Inference
-If you have used Async Inference in your code, benchmark the results and explain its effects on power and performance of your project.
-
 ### Edge Cases
 #### Number of faces detections
 The program works only when a single face is detected in the input. When more than one face is detected, a message shows in the video, and on the terminal.
