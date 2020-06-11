@@ -3,7 +3,7 @@ layout: post
 title: README.md
 date: '2020-06-10 19:04'
 tags:
-  - mouse da
+  - openvino
 ---
 
 # Computer Pointer Controller
