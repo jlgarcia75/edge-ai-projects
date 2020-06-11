@@ -3,16 +3,16 @@ layout: post
 title: README.md
 date: '2020-06-10 19:04'
 tags:
-  - mouse da
+  - openvino
 ---
 
 # Computer Pointer Controller
 
 This is the third project for the Udacity course Intel® Edge AI for IoT Developers. The purpose of this project is to use multiple deep learning models to move a mouse cursor on a screen using eye and head pose from a webcam or video.
 
-When the program starts, a window showing the input video appears in the middle of the screen and the mouse pointer is automatically moved to the center of the screen also. As the person in the video moves their eyes and head, the mouse cursor will move in the same direction. Only one person must be in the frame for the mouse cursor to move.
+When the program starts, a window showing the input video appears in the middle of the screen and the mouse pointer is automatically moved to the center of the screen. As the person in the video moves their eyes and head, the mouse cursor will move in the same direction. Only one person must be in the frame for the mouse cursor to move.
 
-The mouse controller is hardcoded for fast, high-precision movement but you will still see it moving very slowly.
+The mouse controller is hardcoded for fast, high-precision movement but you will still see it moving very slowly. Also, the failsafe mechanism that is default in pyautogui that exits the program when the mouse moves to corner of the screen has been disabled. For this reason, the program gives the ability to run for a user-specified number of frames. Otherwise, if you want to quit the program, alt-tab to the terminal screen and Ctrl-C.
 
 ## Project Set Up and Installation
 ### Prerequisites
@@ -20,6 +20,8 @@ The mouse controller is hardcoded for fast, high-precision movement but you will
 * pandas
 * numpy
 * cv2 (comes with OpenVINO)
+* pyautogui
+* glob
 
 ### Setup
 1.  Clone this git into your working directory.
@@ -144,9 +146,9 @@ optional arguments:
                         default)
 ```
 ## Benchmarks
-Please see ![gaze results](./gaze_results_2020_06_10_6.47.txt) for detailed benchmark data.
+Please see ![gaze results](./src/gaze_benchmark_2020_06_10_6.47.txt) for detailed benchmark data.
 
-The script that runs the benchmarks on Windows is ![runbenchmarks.bat](./runbenchmarks.bat).
+The script that runs the benchmarks on Windows is ![runbenchmarks.bat](./src/runbenchmark.bat).
 
 
 ## Results
@@ -216,7 +218,7 @@ Truely asynchronous inferencing is done by running an unrelated task right after
 
 Due to the indeterminate length of unrelated tasks in Step 2 above, it does not make sense to measure the time between when the asynchronous job begins and when the results are gathered. The asynchronous results could be available any time while the unrelated tasks are running and this time is not captured. For this reason, you will find that in the ASYNC INFER tests the inference time for Landmarks and Head Pose is zero, since it was not measured.
 
-If done right by taking advantage of parallelism, asynchronous inferencing can perform better than synchronous inferencing.
+If done right by taking advantage of parallelism, asynchronous inferencing can perform better than synchronous inferencing. Due to more efficient use of resources, asynchronous inferencing can be faster and use less power.
 
 In the ASYNC INFER tests, the models were configured as such:
 - Facial Detection - Synchronous inference. Reasoning: No job could be run in parallel. Next phase in pipeline could not start until facial detection was completed.
@@ -248,9 +250,6 @@ Landmark Detection load time for FP16 on GPU,CPU: 3302.29ms
 ```
 
 ## Stand Out Suggestions
-### Async Inference
-If you have used Async Inference in your code, benchmark the results and explain its effects on power and performance of your project.
-
 ### Edge Cases
 #### Number of faces detections
 The program works only when a single face is detected in the input. When more than one face is detected, a message shows in the video, and on the terminal.
