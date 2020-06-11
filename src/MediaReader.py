@@ -60,6 +60,9 @@ class MediaReader():
     def get(self, property):
         return self.videosource.get(property)
 
+    def set(self, property,val):
+        return self.videosource.set(property,val)
+
     def read(self):
         try:
             if self.source_type == self.VIDEOSOURCE or self.source_type == self.CAMSOURCE:
