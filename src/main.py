@@ -233,7 +233,7 @@ def infer_on_stream(args):
             print("Too many faces confuse me. I need to see only one face.")
         else:
             print("Is there anybody out there?")
-            
+
     ## End While Loop
     # Release the capture and destroy any OpenCV windows
     print("Video is over. Good bye!")
