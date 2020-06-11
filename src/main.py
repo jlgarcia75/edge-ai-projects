@@ -105,7 +105,10 @@ def build_argparser():
     parser.add_argument("-async", "--async_inference", required=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'],
                     default=True, help="If True, run asynchronous inference where possible. "
                                         "If false, run synchronous inference. True|False. (True by default)")
-
+    parser.add_argument("-v", "--visualize", required=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'],
+                    default=True, help="If True, visualize the outputs from each model. "
+                    "If -v is True then the video will be shown regardless of -bm."
+                    "If false, do not show outputs. True|False. (True by default)")
     return parser
 
 
@@ -124,8 +127,8 @@ def scale_dims(shape, x, y):
     return x, y
 
 #scale the landmarks to the whole frame size
-def scale_landmarks(landmarks, image_shape, orig):
-    color = (0,255,0) #GREEN
+def scale_landmarks(landmarks, image_shape, orig, image):
+    color = (0,0,255) #RED
     thickness = cv2.FILLED
     num_lm = len(landmarks)
     orig_x = orig[0]
@@ -135,10 +138,10 @@ def scale_landmarks(landmarks, image_shape, orig):
         x, y = scale_dims(image_shape, landmarks[point], landmarks[point+1])
         x_scaled = orig_x + x
         y_scaled = orig_y + y
-    #    image = cv2.circle(image, (x_scaled, y_scaled), 2, color, thickness)
+        image = cv2.circle(image, (x_scaled, y_scaled), 2, color, thickness)
         scaled_landmarks.append([x_scaled, y_scaled])
-    #return scaled_landmarks, image
-    return scaled_landmarks
+
+    return scaled_landmarks, image
 
 def process_model_names(name):
         new_path = name.replace("\\","/")
@@ -252,7 +255,7 @@ def infer_on_stream(args):
             mc.put(int(screenWidth/2), int(screenHeight/2)) #Place the mouse cursor in the center of the screen
             frame_count=0
             runtime_start = time.perf_counter()
-            #fd_dir = os.path.join(args.fd_model, precision)
+
             fl_dir = os.path.join(args.fl_model, precision)
             hp_dir = os.path.join(args.hp_model, precision)
             ge_dir = os.path.join(args.ge_model, precision)
@@ -260,7 +263,7 @@ def infer_on_stream(args):
             total_df.loc(axis=0)[fl_infer_network.short_name,precision]['load'] = fl_infer_network.load_model(dir=fl_dir, name=fl_model)
             total_df.loc(axis=0)[hp_infer_network.short_name,precision]['load'] = hp_infer_network.load_model(dir=hp_dir, name=hp_model)
             total_df.loc(axis=0)[ge_infer_network.short_name,precision]['load'] = ge_infer_network.load_model(dir=ge_dir, name=ge_model)
-            
+
             too_many = False
             not_enough = False
             single = False
@@ -282,7 +285,6 @@ def infer_on_stream(args):
                 frame_count+=1
 
                 frame = cv2.putText(frame, text, org, font, fontScale, color, thickness, cv2.LINE_AA)
-                if args.showvideo: cv2.imshow("Out", frame)
 
                 # Break if escape key pressed
                 if cv2.waitKey(25) & 0xFF == ord('q'):
@@ -306,7 +308,7 @@ def infer_on_stream(args):
                     x_min, y_min, x_max, y_max = coords[0]
                     orig_x, orig_y = scale_dims(frame.shape, x_min, y_min)
                     x_max, y_max = scale_dims(frame.shape, x_max, y_max)
-                    #frame = draw_box(frame,(orig_x, orig_y), (x_max, y_max))
+                    frame = draw_box(frame,(orig_x, orig_y), (x_max, y_max))
                     cropped_frame = frame[orig_y:y_max, orig_x:x_max]
 
                     if args.async_inference: #Run asynchronous inference
@@ -331,7 +333,7 @@ def infer_on_stream(args):
                         if fl_infer_network.wait()==0:
                             start_time = time.perf_counter()
                             outputs = fl_infer_network.preprocess_output()
-                            scaled_lm = scale_landmarks(landmarks=outputs[fl_infer_network.output_name][0], image_shape=cropped_frame.shape, orig=(orig_x, orig_y))
+                            scaled_lm, frame = scale_landmarks(landmarks=outputs[fl_infer_network.output_name][0], image_shape=cropped_frame.shape, orig=(orig_x, orig_y),image= frame)
                             total_df.loc(axis=0)[fl_infer_network.short_name,precision]['output']  += time.perf_counter() - start_time
 
                         if hp_infer_network.wait()==0:
@@ -368,7 +370,7 @@ def infer_on_stream(args):
                         text="Is there anybody out there?"
                         print(text)
                         not_enough=True
-
+                if args.showvideo or args.visualization: cv2.imshow("Out", frame)
             ## End While Loop
             runtime[precision] = time.perf_counter() - runtime_start
             # Release the capture and destroy any OpenCV windows
