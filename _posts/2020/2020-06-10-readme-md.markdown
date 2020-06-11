@@ -12,6 +12,8 @@ This is the third project for the Udacity course Intel® Edge AI for IoT Develop
 
 When the program starts, a window showing the input video appears in the middle of the screen and the mouse pointer is automatically moved to the center of the screen also. As the person in the video moves their eyes and head, the mouse cursor will move in the same direction. Only one person must be in the frame for the mouse cursor to move.
 
+The mouse controller is hardcoded for fast, high-precision movement but you will still see it moving very slowly.
+
 ## Project Set Up and Installation
 ### Prerequisites
 * Intel® OpenVINO™ Toolkit 2019.R3 or above
@@ -20,7 +22,7 @@ When the program starts, a window showing the input video appears in the middle 
 * cv2 (comes with OpenVINO)
 
 ### Setup
-1.  Clone git into your working directory.
+1.  Clone this git into your working directory.
 2.  Source the OpenVINO environment.
 
 ### Directory structure
@@ -30,6 +32,30 @@ When the program starts, a window showing the input video appears in the middle 
   bin/demo.mp4 <video file>
   models/intel/<model name>/<precision>/<modelname .bin and .xml>
   ```
+
+  ## Demo
+  Several scripts for both Linux/MacOS (.sh files) and Windows (.bat files) are provided that will run the project with common configurations.
+
+  Take a look at
+  ```
+  rundemo.sh
+  runcam.sh
+  ```
+  and their equivalent files for Windows with ```.bat``` extensions.
+
+  The only required argument is the ```-i``` argument to specify the input. All other arguments are optional and have default values. For an easy run with an input video:
+
+  ```
+  $ source /opt/intel/openvino/bin/setupvars.sh
+  $ cd src
+  $ python main.py -i ../bin/demo.mp4
+  ```
+
+  This will run the program on ![demo.mp4](./bin/demo.mp4) for 100 frames. To run the whole video, specify ```-nf 600``` or higher.
+
+  To run the camera with webcam input:
+  ```$ python main.py -i 0```
+  
 ### Model Inputs
 When specifying the model directories with the -flm, -hpm, and -gem flags you must provide a directory path that ends with the model name just above the <precision>. When you specify the precision you want to load using the -p flag, the precision will be concatenated to the model path to get to the model files.
 
@@ -54,30 +80,6 @@ Facial Landmarks Detection
 Gaze Estimation
 /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name gaze-estimation-adas-0002 -o ./models/
 ```
-
-## Demo
-Several scripts for both Linux/MacOS (.sh files) and Windows (.bat files) are provided that will run the project with common configurations.
-
-Take a look at
-```
-rundemo.sh
-runcam.sh
-```
-and their equivalent files for Windows with ```.bat``` extensions.
-
-The only required argument is the ```-i``` argument to specify the input. All other arguments are optional and have default values. For an easy run with an input video:
-
-```
-$ source /opt/intel/openvino/bin/setupvars.sh
-$ cd src
-$ python main.py -i ../bin/demo.mp4
-```
-
-This will run the program on ![demo.mp4](./bin/demo.mp4) for 100 frames. To run the whole video, specify ```-nf 600``` or higher.
-
-To run the camera with webcam input:
-```$ python main.py -i 0```
-
 
 ## Documentation
 The program has many command line arguments that allow you to customize how it runs.
@@ -183,7 +185,9 @@ The performance metrics are:
 Duration for each phase of model execution: load model, pre-process input, infer, get outputs
 
 And the winners are...
+
 The configuration with the shortest total runtime for 100 frames is:
+
 *CPU - Synchronous Inference - FP32* with a total runtime of 140.54 seconds and .71 FPS.
 
 However, there was not a signifant difference in total runtimes because the runtime was dominated by the mouse movement function call.
