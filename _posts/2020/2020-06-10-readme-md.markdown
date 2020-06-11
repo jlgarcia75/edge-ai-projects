@@ -55,7 +55,7 @@ The mouse controller is hardcoded for fast, high-precision movement but you will
 
   To run the camera with webcam input:
   ```$ python main.py -i 0```
-  
+
 ### Model Inputs
 When specifying the model directories with the -flm, -hpm, and -gem flags you must provide a directory path that ends with the model name just above the <precision>. When you specify the precision you want to load using the -p flag, the precision will be concatenated to the model path to get to the model files.
 
@@ -219,10 +219,10 @@ Due to the indeterminate length of unrelated tasks in Step 2 above, it does not 
 If done right by taking advantage of parallelism, asynchronous inferencing can perform better than synchronous inferencing.
 
 In the ASYNC INFER tests, the models were configured as such:
-Facial Detection - Synchronous inference. Reasoning: No job could be run in parallel. Next phase in pipeline could not start until facial detection was completed.
-Landmark Detection - Asynchronous inference. Reasoning: Inference can run in parallel with Head Pose.
-Head Pose - Asynchronous inference. Reasoning: Inference can run in parallel with Landmark Detection.
-Gaze Estimation - Synchronous Inference. Reasoning: No job could be run in parallel. Mouse mover depends on the output.
+- Facial Detection - Synchronous inference. Reasoning: No job could be run in parallel. Next phase in pipeline could not start until facial detection was completed.
+- Landmark Detection - Asynchronous inference. Reasoning: Inference can run in parallel with Head Pose.
+- Head Pose - Asynchronous inference. Reasoning: Inference can run in parallel with Landmark Detection.
+- Gaze Estimation - Synchronous Inference. Reasoning: No job could be run in parallel. Mouse mover depends on the output.
 
 In the SYNC INFER tests, all models were run with synchronous inferencing so all models had their inference times measured.
 
