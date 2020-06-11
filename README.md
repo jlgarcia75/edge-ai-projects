@@ -10,9 +10,9 @@ tags:
 
 This is the third project for the Udacity course Intel® Edge AI for IoT Developers. The purpose of this project is to use multiple deep learning models to move a mouse cursor on a screen using eye and head pose from a webcam or video.
 
-When the program starts, a window showing the input video appears in the middle of the screen and the mouse pointer is automatically moved to the center of the screen also. As the person in the video moves their eyes and head, the mouse cursor will move in the same direction. Only one person must be in the frame for the mouse cursor to move.
+When the program starts, a window showing the input video appears in the middle of the screen and the mouse pointer is automatically moved to the center of the screen. As the person in the video moves their eyes and head, the mouse cursor will move in the same direction. Only one person must be in the frame for the mouse cursor to move.
 
-The mouse controller is hardcoded for fast, high-precision movement but you will still see it moving very slowly.
+The mouse controller is hardcoded for fast, high-precision movement but you will still see it moving very slowly. Also, the failsafe mechanism that is default in pyautogui that exits the program when the mouse moves to corner of the screen has been disabled. For this reason, the program gives the ability to run for a user-specified number of frames. Otherwise, if you want to quit the program, alt-tab to the terminal screen and Ctrl-C.
 
 ## Project Set Up and Installation
 ### Prerequisites
@@ -20,6 +20,8 @@ The mouse controller is hardcoded for fast, high-precision movement but you will
 * pandas
 * numpy
 * cv2 (comes with OpenVINO)
+* pyautogui
+* glob
 
 ### Setup
 1.  Clone this git into your working directory.
