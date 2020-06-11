@@ -26,11 +26,12 @@ Two scripts are provided that will run the project with a sample demo video or w
 
 ## Documentation
 The program has many command line arguments that allow you to customize how it runs.
-```
+We recommend
+```python
 usage: main.py [-h] -i INPUT [-p PRECISIONS] [-fdm FD_MODEL] [-flm FL_MODEL]
                [-hpm HP_MODEL] [-gem GE_MODEL] [-l CPU_EXTENSION] [-d DEVICE]
-               [-pt PROB_THRESHOLD] [-bm BENCHMARK] [-nf NUM_FRAMES]
-               [-sv SHOWVIDEO] [-async ASYNCINFER]
+               [-ct CONF_THRESHOLD] [-bm BENCHMARK] [-nf NUM_FRAMES]
+               [-sv SHOWVIDEO] [-async ASYNC_INFERENCE]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -41,9 +42,11 @@ optional arguments:
                         spaces, e.g. FP32,FP16,FP32-INT8 (FP16 by default)
   -fdm FD_MODEL, --fd_model FD_MODEL
                         Path to directory for a trained Face Detection
-                        model.The directory must have the model precisions as
-                        subdirectories.(../models/intel/face-detection-adas-
-                        binary-0001 by default)
+                        model.This directory path must include the model's
+                        precision becauseface-detection-adas-binary-0001 has
+                        only one precision, FP32-INT1.(../models/intel/face-
+                        detection-adas-binary-0001/FP32-INT1/face-detection-
+                        adas-binary-0001 by default)
   -flm FL_MODEL, --fl_model FL_MODEL
                         Path to directory for a trained Facial Landmarks
                         model.The directory must have the model precisions as
@@ -67,7 +70,7 @@ optional arguments:
                         or MYRIAD is acceptable. The program will look for a
                         suitable plugin for the device specified (CPU by
                         default)
-  -pt PROB_THRESHOLD, --prob_threshold PROB_THRESHOLD
+  -ct CONF_THRESHOLD, --conf_threshold CONF_THRESHOLD
                         Probability threshold for detections filtering (0.3 by
                         default)
   -bm BENCHMARK, --benchmark BENCHMARK
@@ -78,9 +81,10 @@ optional arguments:
   -sv SHOWVIDEO, --showvideo SHOWVIDEO
                         Show video while running? True|False. (True by
                         default)
-  -async ASYNCINFER, --asyncinfer ASYNCINFER
-                        Run asynchronouse inference landmarks and head pose
-                        models? True|False. (True by default)
+  -async ASYNC_INFERENCE, --async_inference ASYNC_INFERENCE
+                        If True, run asynchronous inference where possible.If
+                        false, run synchronous inference. True|False. (True by
+                        default)
 ```
 ## Benchmarks
 

@@ -1,0 +1,719 @@
+
+(base) c:\Users\jlgarci2\Dropbox\github\move-mouse-pointer\src>python main.py -nf 100 -p FP32 -i ..\bin\demo.mp4 -fdm ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001 -flm ..\models\intel\landmarks-regression-retail-0009 -hpm ..\models\intel\head-pose-estimation-adas-0001 -gem ..\models\intel\gaze-estimation-adas-0002 -d CPU -ct 0.3 -async False -sv False 
+Video being shown:  False
+Beginning test for precision FP32.
+Loading ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001.xml...
+Loading ..\models\intel\landmarks-regression-retail-0009\FP32\landmarks-regression-retail-0009.xml...
+Loading ..\models\intel\head-pose-estimation-adas-0001\FP32\head-pose-estimation-adas-0001.xml...
+Loading ..\models\intel\gaze-estimation-adas-0002\FP32\gaze-estimation-adas-0002.xml...
+I see you. Move the mouse cursor with your eyes.
+Completed run for precision FP32.
+OpenVINO Results
+Current date and time:  2020-06-10 18:50:26
+Platform: win32
+Device: CPU
+Asynchronous Inference: False
+Precision: FP32
+Total frames: 100
+Total runtimes(s):
+      Total runtime       FPS
+FP32     140.543127  0.711525
+
+Total Durations(ms) per phase:
+                                   load     input      infer   output
+Model              Precision                                         
+facial detection   FP32       1004.0035  110.9011  1334.0717   8.2022
+landmark detection FP32        129.5160    9.3132    62.0975   7.0974
+head pose          FP32        120.7649    8.6398   137.4618  12.2359
+gaze estimation    FP32        154.6434    5.5095   151.5653   5.1145
+
+Duration(ms)/Frames per phase:
+                                   load     input      infer    output
+Model              Precision                                          
+facial detection   FP32       10.040035  1.109011  13.340717  0.082022
+landmark detection FP32        1.295160  0.093132   0.620975  0.070974
+head pose          FP32        1.207649  0.086398   1.374618  0.122359
+gaze estimation    FP32        1.546434  0.055095   1.515653  0.051145
+
+*********************************************************************************
+
+
+
+
+(base) c:\Users\jlgarci2\Dropbox\github\move-mouse-pointer\src>python main.py -nf 100 -p FP32 -i ..\bin\demo.mp4 -fdm ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001 -flm ..\models\intel\landmarks-regression-retail-0009 -hpm ..\models\intel\head-pose-estimation-adas-0001 -gem ..\models\intel\gaze-estimation-adas-0002 -d CPU -ct 0.3 -async True -sv False 
+Video being shown:  False
+Beginning test for precision FP32.
+Loading ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001.xml...
+Loading ..\models\intel\landmarks-regression-retail-0009\FP32\landmarks-regression-retail-0009.xml...
+Loading ..\models\intel\head-pose-estimation-adas-0001\FP32\head-pose-estimation-adas-0001.xml...
+Loading ..\models\intel\gaze-estimation-adas-0002\FP32\gaze-estimation-adas-0002.xml...
+I see you. Move the mouse cursor with your eyes.
+Completed run for precision FP32.
+OpenVINO Results
+Current date and time:  2020-06-10 18:52:50
+Platform: win32
+Device: CPU
+Asynchronous Inference: True
+Precision: FP32
+Total frames: 100
+Total runtimes(s):
+      Total runtime       FPS
+FP32     141.617723  0.706126
+
+Total Durations(ms) per phase:
+                                  load     input      infer   output
+Model              Precision                                        
+facial detection   FP32       274.4278  120.5675  1377.0930   8.2726
+landmark detection FP32       112.4609   43.3391     0.0000  46.0577
+head pose          FP32       118.1783   41.6263     0.0000  51.4024
+gaze estimation    FP32       141.0253    5.7817   153.0389   4.7033
+
+Duration(ms)/Frames per phase:
+                                  load     input      infer    output
+Model              Precision                                         
+facial detection   FP32       2.744278  1.205675  13.770930  0.082726
+landmark detection FP32       1.124609  0.433391   0.000000  0.460577
+head pose          FP32       1.181783  0.416263   0.000000  0.514024
+gaze estimation    FP32       1.410253  0.057817   1.530389  0.047033
+
+*********************************************************************************
+
+
+
+
+(base) c:\Users\jlgarci2\Dropbox\github\move-mouse-pointer\src>python main.py -nf 100 -p FP32 -i ..\bin\demo.mp4 -fdm ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001 -flm ..\models\intel\landmarks-regression-retail-0009 -hpm ..\models\intel\head-pose-estimation-adas-0001 -gem ..\models\intel\gaze-estimation-adas-0002 -d HETERO:GPU,CPU -ct 0.3 -async False -sv False 
+conv4_3_0_norm_mbox_loc_perm is GPU
+conv4_3_norm_mbox_loc_perm is GPU
+fc7_mbox_loc_perm is GPU
+conv6_2_mbox_loc_perm is GPU
+conv7_2_mbox_loc_perm is GPU
+conv8_2_mbox_loc_perm is GPU
+conv9_2_mbox_loc_perm is GPU
+mbox_conf_reshape is GPU
+conv9_2_mbox_conf_perm is GPU
+conv8_2_mbox_conf_perm is GPU
+conv7_2_mbox_conf_perm is GPU
+conv6_2_mbox_conf_perm is GPU
+fc7_mbox_conf_perm is GPU
+conv4_3_0_norm_mbox_conf_perm is GPU
+conv4_3_norm_mbox_conf_perm is GPU
+712_const is GPU
+714_const is GPU
+720_const is GPU
+722_const is GPU
+728_const is GPU
+730_const is GPU
+736_const is GPU
+738_const is GPU
+744_const is GPU
+746_const is GPU
+752_const is GPU
+754_const is GPU
+760_const is GPU
+762_const is GPU
+768_const is GPU
+770_const is GPU
+776_const is GPU
+778_const is GPU
+784_const is GPU
+786_const is GPU
+792_const is GPU
+794_const is GPU
+Copy_L0008_ActivationBin-back_bone_seq.conv2_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1184_const is GPU
+Copy_L0008_ActivationBin-back_bone_seq.conv2_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0013_ActivationBin-back_bone_seq.conv3_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1182_const is GPU
+Copy_L0013_ActivationBin-back_bone_seq.conv3_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0018_ActivationBin-back_bone_seq.conv3_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1192_const is GPU
+Copy_L0018_ActivationBin-back_bone_seq.conv3_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0023_ActivationBin-back_bone_seq.conv4_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1174_const is GPU
+Copy_L0023_ActivationBin-back_bone_seq.conv4_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0028_ActivationBin-back_bone_seq.conv4_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1178_const is GPU
+Copy_L0028_ActivationBin-back_bone_seq.conv4_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0033_ActivationBin-back_bone_seq.conv5_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1172_const is GPU
+Copy_L0033_ActivationBin-back_bone_seq.conv5_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0038_ActivationBin-back_bone_seq.conv5_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1180_const is GPU
+Copy_L0038_ActivationBin-back_bone_seq.conv5_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0043_ActivationBin-back_bone_seq.conv5_3_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1176_const is GPU
+Copy_L0043_ActivationBin-back_bone_seq.conv5_3_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0048_ActivationBin-back_bone_seq.conv5_4_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1186_const is GPU
+Copy_L0048_ActivationBin-back_bone_seq.conv5_4_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0053_ActivationBin-back_bone_seq.conv5_5_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1188_const is GPU
+Copy_L0053_ActivationBin-back_bone_seq.conv5_5_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0060_ActivationBin-back_bone_seq.conv5_6_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1190_const is GPU
+Copy_L0060_ActivationBin-back_bone_seq.conv5_6_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+mbox_conf_reshape/DimData_const is GPU
+conv4_3_0_norm_mbox_loc_flat is GPU
+conv4_3_0_norm_mbox_loc_perm is GPU
+conv4_3_norm_mbox_loc_flat is GPU
+conv4_3_norm_mbox_loc_perm is GPU
+fc7_mbox_loc_flat is GPU
+fc7_mbox_loc_perm is GPU
+conv6_2_mbox_loc_flat is GPU
+conv6_2_mbox_loc_perm is GPU
+conv7_2_mbox_loc_flat is GPU
+conv7_2_mbox_loc_perm is GPU
+conv8_2_mbox_loc_flat is GPU
+conv8_2_mbox_loc_perm is GPU
+conv9_2_mbox_loc_flat is GPU
+conv9_2_mbox_loc_perm is GPU
+mbox_conf_flatten is CPU
+mbox_conf_reshape is GPU
+conv9_2_mbox_conf_flat is GPU
+conv9_2_mbox_conf_perm is GPU
+conv8_2_mbox_conf_flat is GPU
+conv8_2_mbox_conf_perm is GPU
+conv7_2_mbox_conf_flat is GPU
+conv7_2_mbox_conf_perm is GPU
+conv6_2_mbox_conf_flat is GPU
+conv6_2_mbox_conf_perm is GPU
+fc7_mbox_conf_flat is GPU
+fc7_mbox_conf_perm is GPU
+conv4_3_0_norm_mbox_conf_flat is GPU
+conv4_3_0_norm_mbox_conf_perm is GPU
+conv4_3_norm_mbox_conf_flat is GPU
+conv4_3_norm_mbox_conf_perm is GPU
+712_const is GPU
+714_const is GPU
+720_const is GPU
+722_const is GPU
+728_const is GPU
+730_const is GPU
+736_const is GPU
+738_const is GPU
+744_const is GPU
+746_const is GPU
+752_const is GPU
+754_const is GPU
+760_const is GPU
+762_const is GPU
+768_const is GPU
+770_const is GPU
+776_const is GPU
+778_const is GPU
+784_const is GPU
+786_const is GPU
+792_const is GPU
+794_const is GPU
+Copy_L0008_ActivationBin-back_bone_seq.conv2_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1184_const is GPU
+Copy_L0008_ActivationBin-back_bone_seq.conv2_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0013_ActivationBin-back_bone_seq.conv3_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1182_const is GPU
+Copy_L0013_ActivationBin-back_bone_seq.conv3_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0018_ActivationBin-back_bone_seq.conv3_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1192_const is GPU
+Copy_L0018_ActivationBin-back_bone_seq.conv3_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0023_ActivationBin-back_bone_seq.conv4_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1174_const is GPU
+Copy_L0023_ActivationBin-back_bone_seq.conv4_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0028_ActivationBin-back_bone_seq.conv4_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1178_const is GPU
+Copy_L0028_ActivationBin-back_bone_seq.conv4_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0033_ActivationBin-back_bone_seq.conv5_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1172_const is GPU
+Copy_L0033_ActivationBin-back_bone_seq.conv5_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0038_ActivationBin-back_bone_seq.conv5_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1180_const is GPU
+Copy_L0038_ActivationBin-back_bone_seq.conv5_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0043_ActivationBin-back_bone_seq.conv5_3_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1176_const is GPU
+Copy_L0043_ActivationBin-back_bone_seq.conv5_3_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0048_ActivationBin-back_bone_seq.conv5_4_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1186_const is GPU
+Copy_L0048_ActivationBin-back_bone_seq.conv5_4_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0053_ActivationBin-back_bone_seq.conv5_5_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1188_const is GPU
+Copy_L0053_ActivationBin-back_bone_seq.conv5_5_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0060_ActivationBin-back_bone_seq.conv5_6_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1190_const is GPU
+Copy_L0060_ActivationBin-back_bone_seq.conv5_6_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+angle_p_fc/flatten_fc_input is GPU
+angle_p_fc/flatten_fc_input/Cast_14129_const is GPU
+angle_r_fc/flatten_fc_input is GPU
+angle_r_fc/flatten_fc_input/Cast_14127_const is GPU
+angle_y_fc/flatten_fc_input is GPU
+angle_y_fc/flatten_fc_input/Cast_14125_const is GPU
+angle_p_fc/flatten_fc_input is GPU
+angle_r_fc/flatten_fc_input is GPU
+angle_y_fc/flatten_fc_input is GPU
+130 is GPU
+130/Cast_15117_const is GPU
+138 is GPU
+138/Cast_15115_const is GPU
+140/Dims/Output_0/Data__const is GPU
+141/Dims/Output_0/Data__const is GPU
+150/Dims/Output_0/Data__const is GPU
+gaze_vector/Dims/Output_0/Data__const is GPU
+gaze_vector is GPU
+150 is GPU
+141250 is GPU
+140256 is GPU
+138 is GPU
+130 is GPU
+Video being shown:  False
+Beginning test for precision FP32.
+Loading ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001.xml...
+Loading ..\models\intel\landmarks-regression-retail-0009\FP32\landmarks-regression-retail-0009.xml...
+Loading ..\models\intel\head-pose-estimation-adas-0001\FP32\head-pose-estimation-adas-0001.xml...
+Loading ..\models\intel\gaze-estimation-adas-0002\FP32\gaze-estimation-adas-0002.xml...
+I see you. Move the mouse cursor with your eyes.
+Completed run for precision FP32.
+OpenVINO Results
+Current date and time:  2020-06-10 18:55:50
+Platform: win32
+Device: HETERO:GPU,CPU
+Asynchronous Inference: False
+Precision: FP32
+Total frames: 100
+Total runtimes(s):
+      Total runtime       FPS
+FP32     178.809629  0.559254
+
+Total Durations(ms) per phase:
+                                    load     input      infer  output
+Model              Precision                                         
+facial detection   FP32       22170.4972  130.0680  1969.8080  8.1724
+landmark detection FP32        3713.9865    9.8518   170.7465  7.0979
+head pose          FP32        4956.4457    8.9116   247.4577  8.8654
+gaze estimation    FP32        5283.8793    6.1217   257.0892  5.0752
+
+Duration(ms)/Frames per phase:
+                                    load     input      infer    output
+Model              Precision                                           
+facial detection   FP32       221.704972  1.300680  19.698080  0.081724
+landmark detection FP32        37.139865  0.098518   1.707465  0.070979
+head pose          FP32        49.564457  0.089116   2.474577  0.088654
+gaze estimation    FP32        52.838793  0.061217   2.570892  0.050752
+
+*********************************************************************************
+
+
+
+
+(base) c:\Users\jlgarci2\Dropbox\github\move-mouse-pointer\src>python main.py -nf 100 -p FP32 -i ..\bin\demo.mp4 -fdm ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001 -flm ..\models\intel\landmarks-regression-retail-0009 -hpm ..\models\intel\head-pose-estimation-adas-0001 -gem ..\models\intel\gaze-estimation-adas-0002 -d HETERO:GPU,CPU -ct 0.3 -async True -sv False 
+conv4_3_0_norm_mbox_loc_perm is GPU
+conv4_3_norm_mbox_loc_perm is GPU
+fc7_mbox_loc_perm is GPU
+conv6_2_mbox_loc_perm is GPU
+conv7_2_mbox_loc_perm is GPU
+conv8_2_mbox_loc_perm is GPU
+conv9_2_mbox_loc_perm is GPU
+mbox_conf_reshape is GPU
+conv9_2_mbox_conf_perm is GPU
+conv8_2_mbox_conf_perm is GPU
+conv7_2_mbox_conf_perm is GPU
+conv6_2_mbox_conf_perm is GPU
+fc7_mbox_conf_perm is GPU
+conv4_3_0_norm_mbox_conf_perm is GPU
+conv4_3_norm_mbox_conf_perm is GPU
+712_const is GPU
+714_const is GPU
+720_const is GPU
+722_const is GPU
+728_const is GPU
+730_const is GPU
+736_const is GPU
+738_const is GPU
+744_const is GPU
+746_const is GPU
+752_const is GPU
+754_const is GPU
+760_const is GPU
+762_const is GPU
+768_const is GPU
+770_const is GPU
+776_const is GPU
+778_const is GPU
+784_const is GPU
+786_const is GPU
+792_const is GPU
+794_const is GPU
+Copy_L0008_ActivationBin-back_bone_seq.conv2_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1184_const is GPU
+Copy_L0008_ActivationBin-back_bone_seq.conv2_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0013_ActivationBin-back_bone_seq.conv3_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1182_const is GPU
+Copy_L0013_ActivationBin-back_bone_seq.conv3_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0018_ActivationBin-back_bone_seq.conv3_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1192_const is GPU
+Copy_L0018_ActivationBin-back_bone_seq.conv3_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0023_ActivationBin-back_bone_seq.conv4_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1174_const is GPU
+Copy_L0023_ActivationBin-back_bone_seq.conv4_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0028_ActivationBin-back_bone_seq.conv4_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1178_const is GPU
+Copy_L0028_ActivationBin-back_bone_seq.conv4_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0033_ActivationBin-back_bone_seq.conv5_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1172_const is GPU
+Copy_L0033_ActivationBin-back_bone_seq.conv5_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0038_ActivationBin-back_bone_seq.conv5_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1180_const is GPU
+Copy_L0038_ActivationBin-back_bone_seq.conv5_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0043_ActivationBin-back_bone_seq.conv5_3_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1176_const is GPU
+Copy_L0043_ActivationBin-back_bone_seq.conv5_3_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0048_ActivationBin-back_bone_seq.conv5_4_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1186_const is GPU
+Copy_L0048_ActivationBin-back_bone_seq.conv5_4_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0053_ActivationBin-back_bone_seq.conv5_5_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1188_const is GPU
+Copy_L0053_ActivationBin-back_bone_seq.conv5_5_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0060_ActivationBin-back_bone_seq.conv5_6_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1190_const is GPU
+Copy_L0060_ActivationBin-back_bone_seq.conv5_6_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+mbox_conf_reshape/DimData_const is GPU
+conv4_3_0_norm_mbox_loc_flat is GPU
+conv4_3_0_norm_mbox_loc_perm is GPU
+conv4_3_norm_mbox_loc_flat is GPU
+conv4_3_norm_mbox_loc_perm is GPU
+fc7_mbox_loc_flat is GPU
+fc7_mbox_loc_perm is GPU
+conv6_2_mbox_loc_flat is GPU
+conv6_2_mbox_loc_perm is GPU
+conv7_2_mbox_loc_flat is GPU
+conv7_2_mbox_loc_perm is GPU
+conv8_2_mbox_loc_flat is GPU
+conv8_2_mbox_loc_perm is GPU
+conv9_2_mbox_loc_flat is GPU
+conv9_2_mbox_loc_perm is GPU
+mbox_conf_flatten is CPU
+mbox_conf_reshape is GPU
+conv9_2_mbox_conf_flat is GPU
+conv9_2_mbox_conf_perm is GPU
+conv8_2_mbox_conf_flat is GPU
+conv8_2_mbox_conf_perm is GPU
+conv7_2_mbox_conf_flat is GPU
+conv7_2_mbox_conf_perm is GPU
+conv6_2_mbox_conf_flat is GPU
+conv6_2_mbox_conf_perm is GPU
+fc7_mbox_conf_flat is GPU
+fc7_mbox_conf_perm is GPU
+conv4_3_0_norm_mbox_conf_flat is GPU
+conv4_3_0_norm_mbox_conf_perm is GPU
+conv4_3_norm_mbox_conf_flat is GPU
+conv4_3_norm_mbox_conf_perm is GPU
+712_const is GPU
+714_const is GPU
+720_const is GPU
+722_const is GPU
+728_const is GPU
+730_const is GPU
+736_const is GPU
+738_const is GPU
+744_const is GPU
+746_const is GPU
+752_const is GPU
+754_const is GPU
+760_const is GPU
+762_const is GPU
+768_const is GPU
+770_const is GPU
+776_const is GPU
+778_const is GPU
+784_const is GPU
+786_const is GPU
+792_const is GPU
+794_const is GPU
+Copy_L0008_ActivationBin-back_bone_seq.conv2_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1184_const is GPU
+Copy_L0008_ActivationBin-back_bone_seq.conv2_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0013_ActivationBin-back_bone_seq.conv3_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1182_const is GPU
+Copy_L0013_ActivationBin-back_bone_seq.conv3_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0018_ActivationBin-back_bone_seq.conv3_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1192_const is GPU
+Copy_L0018_ActivationBin-back_bone_seq.conv3_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0023_ActivationBin-back_bone_seq.conv4_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1174_const is GPU
+Copy_L0023_ActivationBin-back_bone_seq.conv4_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0028_ActivationBin-back_bone_seq.conv4_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1178_const is GPU
+Copy_L0028_ActivationBin-back_bone_seq.conv4_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0033_ActivationBin-back_bone_seq.conv5_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1172_const is GPU
+Copy_L0033_ActivationBin-back_bone_seq.conv5_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0038_ActivationBin-back_bone_seq.conv5_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1180_const is GPU
+Copy_L0038_ActivationBin-back_bone_seq.conv5_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0043_ActivationBin-back_bone_seq.conv5_3_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1176_const is GPU
+Copy_L0043_ActivationBin-back_bone_seq.conv5_3_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0048_ActivationBin-back_bone_seq.conv5_4_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1186_const is GPU
+Copy_L0048_ActivationBin-back_bone_seq.conv5_4_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0053_ActivationBin-back_bone_seq.conv5_5_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1188_const is GPU
+Copy_L0053_ActivationBin-back_bone_seq.conv5_5_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0060_ActivationBin-back_bone_seq.conv5_6_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1190_const is GPU
+Copy_L0060_ActivationBin-back_bone_seq.conv5_6_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+angle_p_fc/flatten_fc_input is GPU
+angle_p_fc/flatten_fc_input/Cast_14129_const is GPU
+angle_r_fc/flatten_fc_input is GPU
+angle_r_fc/flatten_fc_input/Cast_14127_const is GPU
+angle_y_fc/flatten_fc_input is GPU
+angle_y_fc/flatten_fc_input/Cast_14125_const is GPU
+angle_p_fc/flatten_fc_input is GPU
+angle_r_fc/flatten_fc_input is GPU
+angle_y_fc/flatten_fc_input is GPU
+130 is GPU
+130/Cast_15117_const is GPU
+138 is GPU
+138/Cast_15115_const is GPU
+140/Dims/Output_0/Data__const is GPU
+141/Dims/Output_0/Data__const is GPU
+150/Dims/Output_0/Data__const is GPU
+gaze_vector/Dims/Output_0/Data__const is GPU
+gaze_vector is GPU
+150 is GPU
+141250 is GPU
+140256 is GPU
+138 is GPU
+130 is GPU
+Video being shown:  False
+Beginning test for precision FP32.
+Loading ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001.xml...
+Loading ..\models\intel\landmarks-regression-retail-0009\FP32\landmarks-regression-retail-0009.xml...
+Loading ..\models\intel\head-pose-estimation-adas-0001\FP32\head-pose-estimation-adas-0001.xml...
+Loading ..\models\intel\gaze-estimation-adas-0002\FP32\gaze-estimation-adas-0002.xml...
+I see you. Move the mouse cursor with your eyes.
+Completed run for precision FP32.
+OpenVINO Results
+Current date and time:  2020-06-10 18:58:48
+Platform: win32
+Device: HETERO:GPU,CPU
+Asynchronous Inference: True
+Precision: FP32
+Total frames: 100
+Total runtimes(s):
+      Total runtime       FPS
+FP32     175.723542  0.569076
+
+Total Durations(ms) per phase:
+                                    load     input      infer   output
+Model              Precision                                          
+facial detection   FP32       21246.7305  107.5797  1928.0940   7.9464
+landmark detection FP32        3620.1591   42.4590     0.0000  56.8642
+head pose          FP32        4842.7951   35.6145     0.0000  62.4433
+gaze estimation    FP32        5352.1022    6.7453   255.1507   5.4357
+
+Duration(ms)/Frames per phase:
+                                    load     input      infer    output
+Model              Precision                                           
+facial detection   FP32       212.467305  1.075797  19.280940  0.079464
+landmark detection FP32        36.201591  0.424590   0.000000  0.568642
+head pose          FP32        48.427951  0.356145   0.000000  0.624433
+gaze estimation    FP32        53.521022  0.067453   2.551507  0.054357
+
+*********************************************************************************
+
+
+
+
+(base) c:\Users\jlgarci2\Dropbox\github\move-mouse-pointer\src>python main.py -nf 100 -p FP16 -i ..\bin\demo.mp4 -fdm ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001 -flm ..\models\intel\landmarks-regression-retail-0009 -hpm ..\models\intel\head-pose-estimation-adas-0001 -gem ..\models\intel\gaze-estimation-adas-0002 -d CPU -ct 0.3 -async False -sv False 
+Video being shown:  False
+Beginning test for precision FP16.
+Loading ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001.xml...
+Loading ..\models\intel\landmarks-regression-retail-0009\FP16\landmarks-regression-retail-0009.xml...
+Loading ..\models\intel\head-pose-estimation-adas-0001\FP16\head-pose-estimation-adas-0001.xml...
+Loading ..\models\intel\gaze-estimation-adas-0002\FP16\gaze-estimation-adas-0002.xml...
+I see you. Move the mouse cursor with your eyes.
+Completed run for precision FP16.
+OpenVINO Results
+Current date and time:  2020-06-10 19:01:13
+Platform: win32
+Device: CPU
+Asynchronous Inference: False
+Precision: FP16
+Total frames: 100
+Total runtimes(s):
+      Total runtime       FPS
+FP16      142.47004  0.701902
+
+Total Durations(ms) per phase:
+                                  load     input      infer   output
+Model              Precision                                        
+facial detection   FP16       336.8771  122.2610  1254.0623   7.5654
+landmark detection FP16       137.3295    8.9985    59.2689   6.2735
+head pose          FP16       158.8207    7.6505   129.6631  12.2008
+gaze estimation    FP16       174.1827    5.3871   149.0565   4.5068
+
+Duration(ms)/Frames per phase:
+                                  load     input      infer    output
+Model              Precision                                         
+facial detection   FP16       3.368771  1.222610  12.540623  0.075654
+landmark detection FP16       1.373295  0.089985   0.592689  0.062735
+head pose          FP16       1.588207  0.076505   1.296631  0.122008
+gaze estimation    FP16       1.741827  0.053871   1.490565  0.045068
+
+*********************************************************************************
+
+
+
+
+(base) c:\Users\jlgarci2\Dropbox\github\move-mouse-pointer\src>python main.py -nf 100 -p FP16 -i ..\bin\demo.mp4 -fdm ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001 -flm ..\models\intel\landmarks-regression-retail-0009 -hpm ..\models\intel\head-pose-estimation-adas-0001 -gem ..\models\intel\gaze-estimation-adas-0002 -d CPU -ct 0.3 -async True -sv False 
+Video being shown:  False
+Beginning test for precision FP16.
+Loading ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001.xml...
+Loading ..\models\intel\landmarks-regression-retail-0009\FP16\landmarks-regression-retail-0009.xml...
+Loading ..\models\intel\head-pose-estimation-adas-0001\FP16\head-pose-estimation-adas-0001.xml...
+Loading ..\models\intel\gaze-estimation-adas-0002\FP16\gaze-estimation-adas-0002.xml...
+I see you. Move the mouse cursor with your eyes.
+Completed run for precision FP16.
+OpenVINO Results
+Current date and time:  2020-06-10 19:03:38
+Platform: win32
+Device: CPU
+Asynchronous Inference: True
+Precision: FP16
+Total frames: 100
+Total runtimes(s):
+      Total runtime      FPS
+FP16      142.58615  0.70133
+
+Total Durations(ms) per phase:
+                                  load     input      infer   output
+Model              Precision                                        
+facial detection   FP16       326.6990  111.5417  1263.1924   7.5021
+landmark detection FP16       111.6126   42.0165     0.0000  40.9179
+head pose          FP16       130.1433   38.0417     0.0000  50.2393
+gaze estimation    FP16       152.9360    6.0052   152.5661   4.8888
+
+Duration(ms)/Frames per phase:
+                                  load     input      infer    output
+Model              Precision                                         
+facial detection   FP16       3.266990  1.115417  12.631924  0.075021
+landmark detection FP16       1.116126  0.420165   0.000000  0.409179
+head pose          FP16       1.301433  0.380417   0.000000  0.502393
+gaze estimation    FP16       1.529360  0.060052   1.525661  0.048888
+
+*********************************************************************************
+
+
+
+
+(base) c:\Users\jlgarci2\Dropbox\github\move-mouse-pointer\src>python main.py -nf 100 -p FP16 -i ..\bin\demo.mp4 -fdm ..\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001 -flm ..\models\intel\landmarks-regression-retail-0009 -hpm ..\models\intel\head-pose-estimation-adas-0001 -gem ..\models\intel\gaze-estimation-adas-0002 -d HETERO:GPU,CPU -ct 0.3 -async False -sv False 
+conv4_3_0_norm_mbox_loc_perm is GPU
+conv4_3_norm_mbox_loc_perm is GPU
+fc7_mbox_loc_perm is GPU
+conv6_2_mbox_loc_perm is GPU
+conv7_2_mbox_loc_perm is GPU
+conv8_2_mbox_loc_perm is GPU
+conv9_2_mbox_loc_perm is GPU
+mbox_conf_reshape is GPU
+conv9_2_mbox_conf_perm is GPU
+conv8_2_mbox_conf_perm is GPU
+conv7_2_mbox_conf_perm is GPU
+conv6_2_mbox_conf_perm is GPU
+fc7_mbox_conf_perm is GPU
+conv4_3_0_norm_mbox_conf_perm is GPU
+conv4_3_norm_mbox_conf_perm is GPU
+712_const is GPU
+714_const is GPU
+720_const is GPU
+722_const is GPU
+728_const is GPU
+730_const is GPU
+736_const is GPU
+738_const is GPU
+744_const is GPU
+746_const is GPU
+752_const is GPU
+754_const is GPU
+760_const is GPU
+762_const is GPU
+768_const is GPU
+770_const is GPU
+776_const is GPU
+778_const is GPU
+784_const is GPU
+786_const is GPU
+792_const is GPU
+794_const is GPU
+Copy_L0008_ActivationBin-back_bone_seq.conv2_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1184_const is GPU
+Copy_L0008_ActivationBin-back_bone_seq.conv2_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0013_ActivationBin-back_bone_seq.conv3_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1182_const is GPU
+Copy_L0013_ActivationBin-back_bone_seq.conv3_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0018_ActivationBin-back_bone_seq.conv3_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1192_const is GPU
+Copy_L0018_ActivationBin-back_bone_seq.conv3_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0023_ActivationBin-back_bone_seq.conv4_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1174_const is GPU
+Copy_L0023_ActivationBin-back_bone_seq.conv4_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0028_ActivationBin-back_bone_seq.conv4_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1178_const is GPU
+Copy_L0028_ActivationBin-back_bone_seq.conv4_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0033_ActivationBin-back_bone_seq.conv5_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1172_const is GPU
+Copy_L0033_ActivationBin-back_bone_seq.conv5_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0038_ActivationBin-back_bone_seq.conv5_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1180_const is GPU
+Copy_L0038_ActivationBin-back_bone_seq.conv5_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0043_ActivationBin-back_bone_seq.conv5_3_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1176_const is GPU
+Copy_L0043_ActivationBin-back_bone_seq.conv5_3_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0048_ActivationBin-back_bone_seq.conv5_4_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1186_const is GPU
+Copy_L0048_ActivationBin-back_bone_seq.conv5_4_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0053_ActivationBin-back_bone_seq.conv5_5_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1188_const is GPU
+Copy_L0053_ActivationBin-back_bone_seq.conv5_5_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0060_ActivationBin-back_bone_seq.conv5_6_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1190_const is GPU
+Copy_L0060_ActivationBin-back_bone_seq.conv5_6_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+mbox_conf_reshape/DimData_const is GPU
+conv4_3_0_norm_mbox_loc_flat is GPU
+conv4_3_0_norm_mbox_loc_perm is GPU
+conv4_3_norm_mbox_loc_flat is GPU
+conv4_3_norm_mbox_loc_perm is GPU
+fc7_mbox_loc_flat is GPU
+fc7_mbox_loc_perm is GPU
+conv6_2_mbox_loc_flat is GPU
+conv6_2_mbox_loc_perm is GPU
+conv7_2_mbox_loc_flat is GPU
+conv7_2_mbox_loc_perm is GPU
+conv8_2_mbox_loc_flat is GPU
+conv8_2_mbox_loc_perm is GPU
+conv9_2_mbox_loc_flat is GPU
+conv9_2_mbox_loc_perm is GPU
+mbox_conf_flatten is CPU
+mbox_conf_reshape is GPU
+conv9_2_mbox_conf_flat is GPU
+conv9_2_mbox_conf_perm is GPU
+conv8_2_mbox_conf_flat is GPU
+conv8_2_mbox_conf_perm is GPU
+conv7_2_mbox_conf_flat is GPU
+conv7_2_mbox_conf_perm is GPU
+conv6_2_mbox_conf_flat is GPU
+conv6_2_mbox_conf_perm is GPU
+fc7_mbox_conf_flat is GPU
+fc7_mbox_conf_perm is GPU
+conv4_3_0_norm_mbox_conf_flat is GPU
+conv4_3_0_norm_mbox_conf_perm is GPU
+conv4_3_norm_mbox_conf_flat is GPU
+conv4_3_norm_mbox_conf_perm is GPU
+712_const is GPU
+714_const is GPU
+720_const is GPU
+722_const is GPU
+728_const is GPU
+730_const is GPU
+736_const is GPU
+738_const is GPU
+744_const is GPU
+746_const is GPU
+752_const is GPU
+754_const is GPU
+760_const is GPU
+762_const is GPU
+768_const is GPU
+770_const is GPU
+776_const is GPU
+778_const is GPU
+784_const is GPU
+786_const is GPU
+792_const is GPU
+794_const is GPU
+Copy_L0008_ActivationBin-back_bone_seq.conv2_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1184_const is GPU
+Copy_L0008_ActivationBin-back_bone_seq.conv2_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0013_ActivationBin-back_bone_seq.conv3_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1182_const is GPU
+Copy_L0013_ActivationBin-back_bone_seq.conv3_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0018_ActivationBin-back_bone_seq.conv3_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1192_const is GPU
+Copy_L0018_ActivationBin-back_bone_seq.conv3_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0023_ActivationBin-back_bone_seq.conv4_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1174_const is GPU
+Copy_L0023_ActivationBin-back_bone_seq.conv4_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0028_ActivationBin-back_bone_seq.conv4_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1178_const is GPU
+Copy_L0028_ActivationBin-back_bone_seq.conv4_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0033_ActivationBin-back_bone_seq.conv5_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1172_const is GPU
+Copy_L0033_ActivationBin-back_bone_seq.conv5_1_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0038_ActivationBin-back_bone_seq.conv5_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1180_const is GPU
+Copy_L0038_ActivationBin-back_bone_seq.conv5_2_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0043_ActivationBin-back_bone_seq.conv5_3_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1176_const is GPU
+Copy_L0043_ActivationBin-back_bone_seq.conv5_3_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0048_ActivationBin-back_bone_seq.conv5_4_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1186_const is GPU
+Copy_L0048_ActivationBin-back_bone_seq.conv5_4_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0053_ActivationBin-back_bone_seq.conv5_5_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1188_const is GPU
+Copy_L0053_ActivationBin-back_bone_seq.conv5_5_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+Copy_L0060_ActivationBin-back_bone_seq.conv5_6_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data_1190_const is GPU
+Copy_L0060_ActivationBin-back_bone_seq.conv5_6_sep_relubin_bin_conv_BIN01/Input_1/Output_0/Data__const is GPU
+angle_p_fc/flatten_fc_input is GPU
+angle_p_fc/flatten_fc_input/Cast_14129_const is GPU
+angle_r_fc/flatten_fc_input is GPU
+angle_r_fc/flatten_fc_input/Cast_14127_const is GPU
+angle_y_fc/flatten_fc_input is GPU
+angle_y_fc/flatten_fc_input/Cast_14125_const is GPU
+angle_p_fc/flatten_fc_input is GPU
+angle_r_fc/flatten_fc_input is GPU
+angle_y_fc/flatten_fc_input is GPU
+130 is GPU
+130/Cast_15117_const is GPU
+138 is GPU
+138/Cast_15115_const is GPU
+140/Dims/Output_0/Data__const is GPU
+141/Dims/Output_0/Data__const is GPU
+150/Dims/Output_0/Data__const is GPU
+gaze_vector/Dims/Output_0/Data__const is GPU
+gaze_vector is GPU
+150 is GPU
+141252 is GPU
+140256 is GPU
+138 is GPU
+130 is GPU

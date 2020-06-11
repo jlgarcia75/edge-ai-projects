@@ -1,0 +1,193 @@
+---
+layout: post
+title: README.md
+date: '2020-06-10 19:04'
+---
+
+# Computer Pointer Controller
+
+This is the third project for the Udacity course Intel® Edge AI for IoT Developers. The purpose of this project is to use multiple deep learning models to move a mouse cursor on a screen using eye and head pose from a webcam or video.
+
+When the program starts, a window showing the input video appears in the middle of the screen and the mouse pointer is automatically moved to the center of the screen also. As the person in the video moves their eyes and head, the mouse cursor will move in the same direction. Only one person must be in the frame for the mouse cursor to move.
+
+## Project Set Up and Installation
+### Prerequisites
+* Intel® OpenVINO™ Toolkit 2019.R3 or above
+* pandas
+* numpy
+* cv2 (comes with OpenVINO)
+
+### Setup
+1.  Clone git into your working directory.
+2.  Source the OpenVINO environment.
+3.
+
+
+## Demo
+Two scripts are provided that will run the project with a sample demo video or with your webcam.
+### Linux or MacOS
+  * rundemo.sh
+  * runcam.sh
+### Windows
+  * rundemo.bat
+  * runcam.bat
+
+## Documentation
+The program has many command line arguments that allow you to customize how it runs.
+We recommend
+```python
+usage: main.py [-h] -i INPUT [-p PRECISIONS] [-fdm FD_MODEL] [-flm FL_MODEL]
+               [-hpm HP_MODEL] [-gem GE_MODEL] [-l CPU_EXTENSION] [-d DEVICE]
+               [-ct CONF_THRESHOLD] [-bm BENCHMARK] [-nf NUM_FRAMES]
+               [-sv SHOWVIDEO] [-async ASYNC_INFERENCE]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        Path to input image or video file. 0 for webcam.
+  -p PRECISIONS, --precisions PRECISIONS
+                        Set model precisions as a comma-separated list without
+                        spaces, e.g. FP32,FP16,FP32-INT8 (FP16 by default)
+  -fdm FD_MODEL, --fd_model FD_MODEL
+                        Path to directory for a trained Face Detection
+                        model. This directory path must include the model's
+                        precision becauseface-detection-adas-binary-0001 has
+                        only one precision, FP32-INT1.(../models/intel/face-
+                        detection-adas-binary-0001/FP32-INT1/face-detection-
+                        adas-binary-0001 by default)
+  -flm FL_MODEL, --fl_model FL_MODEL
+                        Path to directory for a trained Facial Landmarks
+                        model. The directory must have the model precisions as
+                        subdirectories.../models/intel/landmarks-regression-
+                        retail-0009 by default)
+  -hpm HP_MODEL, --hp_model HP_MODEL
+                        Path to directory for a trained Head Pose model. The
+                        directory must have the model precisions as
+                        subdirectories.(../models/intel/head-pose-estimation-
+                        adas-0001 by default)
+  -gem GE_MODEL, --ge_model GE_MODEL
+                        Path to directory for a trained Gaze Detection
+                        model. The directory must have the model precisions as
+                        subdirectories.(../models/intel/gaze-estimation-
+                        adas-0002 by default)
+  -l CPU_EXTENSION, --cpu_extension CPU_EXTENSION
+                        MKLDNN (CPU)-targeted custom layers. Absolute path to a
+                        shared library with thekernels impl.
+  -d DEVICE, --device DEVICE
+                        Specify the target device to infer on: CPU, GPU, FPGA
+                        or MYRIAD is acceptable. The program will look for a
+                        suitable plugin for the device specified (CPU by
+                        default)
+  -ct CONF_THRESHOLD, --conf_threshold CONF_THRESHOLD
+                        Confidence threshold for detections filtering (0.3 by
+                        default)
+  -bm BENCHMARK, --benchmark BENCHMARK
+                        Show benchmark data? True|False (True by default)
+  -nf NUM_FRAMES, --num_frames NUM_FRAMES
+                        The number of frames to run. Use this to limit running
+                        time, especially if using webcam. (100 by default)
+  -sv SHOWVIDEO, --showvideo SHOWVIDEO
+                        Show video while running? True|False. (True by
+                        default)
+  -async ASYNC_INFERENCE, --async_inference ASYNC_INFERENCE
+                        If True, run asynchronous inference where possible. If
+                        false, run synchronous inference. True|False. (True by
+                        default)
+```
+## Benchmarks
+
+
+Please see ![gaze results](./gaze_results_2020_06_10_9.22.txt) for detailed benchmark data.
+
+
+## Results
+Benchmarks were gathered across eight separate runs of the program. The configurations were:
+1. Device: CPU; Inference Type: Asynchronous; Precision: FP32
+2. Device: CPU; Inference Type: Synchronous, Precision:FP32
+3. Device: CPU; Inference Type: Asynchronous, Precision:FP16
+4. Device: CPU; Inference Type: Synchronous, Precision:FP16
+5. Device: HETERO:GPU,CPU; Inference Type: Asynchronous, Precision:FP32
+6. Device: HETERO:GPU,CPU; Inference Type: Synchronous, Precision:FP32
+7. Device: HETERO:GPU,CPU; Inference Type: Asynchronous, Precision:FP16
+6. HETERO:GPU,CPU; Inference Type: Synchronous, Precision: FP16
+
+Device  | Inference Type  |  Precision
+--|---|--
+CPU  | Asynchronous|  FP32
+CPU  | Synchronous |  FP32
+CPU  | Asynchronous| FP16
+CPU  | Synchronous |  FP32
+HETERO:GPU,CPU  |Asynchronous| FP32
+HETERO:GPU,CPU  |Synchronous | FP32
+HETERO:GPU,CPU  |Asynchronous| FP16
+HETERO:GPU,CPU  |Synchronous | FP16
+
+Each run was done on the first 100 frames of the video ![demo.mp4](./bin/demo.mp4).
+
+### Asynchronous vs. Synchronous Inferencing
+Asynchronous inferencing makes sense when unrelated tasks can be done in parallel. For example, an asynchronous inference can be started for two models who work on data indepedently and don't depend on each other's outputs. While there are many opportunities for parallelism in this program, I chose the simplest one and most obvious one.
+
+The Landmark Detection and Head Pose Estimation phases are independent from each other but both depend on the output from the previous phase, Face Detection. The two outputs from Landmark and Head are sent to Gaze Estimation, which is the last phase in the pipeline. For this reason, I chose to run Landmark Detection and Head Pose Estimation with asynchronous inferencing.
+
+Truely asynchronous inferencing is done by running an unrelated task right after the inference is started, as follows:
+1. Start async inference job
+2. Do unrelated tasks
+3. When the result from an async job is needed, call blocking function Wait() to wait for the results to be available. This is the point where processing cannot proceed without the results from the async inference job. A callback function can also be set that gets called when the inference task is finished. In my code, I used the wait() function instead of the callback.
+
+Due to the indeterminate length of unrelated tasks in Step 2 above, it does not make sense to measure the time between when the asynchronous job begins and when the results are gathered. The asynchronous results could be available any time while the unrelated tasks are running and this time is not captured. For this reason, you will find that in the ASYNC INFER tests the inference time for Landmarks and Head Pose is zero, since it was not measured.
+
+In the ASYNC INFER tests, the models were configured as such:
+Facial Detection - Synchronous inference. Reasoning: No job could be run in parallel. Next phase in pipeline could not start until facial detection was completed.
+Landmark Detection - Asynchronous inference. Reasoning: Inference can run in parallel with Head Pose.
+Head Pose - Asynchronous inference. Reasoning: Inference can run in parallel with Landmark Detection.
+Gaze Estimation - Synchronous Inference. Reasoning: No job could be run in parallel. Mouse mover depends on the output.
+
+In the SYNC INFER tests, all models were run with synchronous inferencing so all models had their inference times measured.
+
+### Available Model Precisions
+Face Detection: FP32-INT1
+Landmark Detection: FP32, FP16, FP32-INT8
+Head Pose: FP32, FP16, FP32-INT8
+Gaze Estimation: FP32, FP16, FP32-INT8
+
+Benchmarks were run only for FP32 and FP16. Since the only available precision for Face Detection is FP32-INT1, this precision was used for both FP32 and FP16 runs. In the results, you will see FP32 and FP16 next to Face Detection but don't be confused, these were both run with the same model at FP32-INT1.
+
+
+### Total runtime analysis
+Config  |  Total runtime(s) |  FPS |
+--|---|---|--
+SYNC INFER - CPU - FP32  | 123.695371  | 0.808438  |
+SYNC INFER - CPU - FP16|  123.438669 | 0.810119  |
+ASYNC INFER - CPU - FP32  |  123.135343 |  0.812115 |
+ASYNC INFER - CPU - FP16  | 123.447517  | 0.810061  |
+SYNC INFER - GPU,CPU - FP32  | 160.078532  | 0.624693  |
+SYNC INFER - GPU,CPU - FP16|  158.048177 | 0.632718  |
+ASYNC INFER - GPU,CPU - FP32  | 158.475282  |  0.631013 |
+ASYNC INFER - GPU,CPU - FP16  |  158.315022 | 0.631652  |
+
+
+The results above show that the total runtime when the GPU was used was longer than when only the CPU was used. The program was not tested on MYRIAD because the models could not be loaded onto the NCS2.
+
+There was not a signifant difference in total runtimes because the runtime was dominated by the mouse movement function call.
+### Load Time Analysis
+FP32 models are about twice as large as FP16 models because the FP32 data is 4 bytes long while FP16 data is 2 bytes long.
+
+
+
+## Stand Out Suggestions
+### Number of faces detections
+
+
+### Async Inference
+If you have used Async Inference in your code, benchmark the results and explain its effects on power and performance of your project.
+
+### Edge Cases
+The program works only when a single face is detected in the input. When more than one face is detected, a message shows in the video, and on the terminal.
+
+* One face: "I see you. Move the mouse cursor with your eyes." * Run inference *
+* More than one face: "Too many faces confuse me. I need to see only one face." *Do not run inference*
+* No faces: "Is there anybody out there." * Do not run inference *
+
+Here is a sample picture with two faces. Notice the text message at the top left of the frame.
+
+![Too many faces](src/too_many.png)

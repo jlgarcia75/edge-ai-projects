@@ -58,42 +58,42 @@ def build_argparser():
     parser.add_argument("-i", "--input", required=True, type=str,
                         help="Path to input image or video file. 0 for webcam.")
     parser.add_argument("-p", "--precisions", required=False, type=str, default='FP16',
-                                        help="Set model precisions as a comma-separated list without spaces"
-                                           ", e.g. FP32,FP16,FP32-INT8 (FP16 by default)")
+                        help="Set model precisions as a comma-separated list without spaces"
+                        ", e.g. FP32,FP16,FP32-INT8 (FP16 by default)")
     parser.add_argument("-fdm", "--fd_model", required=False, type=str,
                         help="Path to directory for a trained Face Detection model."
-                        "This directory path must include the model's precision because"
+                        " This directory path must include the model's precision because"
                         "face-detection-adas-binary-0001 has only one precision, FP32-INT1."
                         "(../models/intel/face-detection-adas-binary-0001/FP32-INT1/face-detection-adas-binary-0001"
                         " by default)",
                         default="../models/intel/face-detection-adas-binary-0001/FP32-INT1/face-detection-adas-binary-0001")
     parser.add_argument("-flm", "--fl_model", required=False, type=str,
                         help="Path to directory for a trained Facial Landmarks model."
-                        "The directory must have the model precisions as subdirectories."
+                        " The directory must have the model precisions as subdirectories."
                         "../models/intel/landmarks-regression-retail-0009 by default)",
                         default="../models/intel/landmarks-regression-retail-0009")
     parser.add_argument("-hpm", "--hp_model", required=False, type=str,
                         help="Path to directory for a trained Head Pose model."
-                        "The directory must have the model precisions as subdirectories."
+                        " The directory must have the model precisions as subdirectories."
                         "(../models/intel/head-pose-estimation-adas-0001 by default)",
                         default="../models/intel/head-pose-estimation-adas-0001")
     parser.add_argument("-gem", "--ge_model", required=False, type=str,
                         help="Path to directory for a trained Gaze Detection model."
-                        "The directory must have the model precisions as subdirectories."
+                        " The directory must have the model precisions as subdirectories."
                         "(../models/intel/gaze-estimation-adas-0002 by default)",
                         default="../models/intel/gaze-estimation-adas-0002")
     parser.add_argument("-l", "--cpu_extension", required=False, type=str,
                         default=None,
                         help="MKLDNN (CPU)-targeted custom layers."
-                             "Absolute path to a shared library with the"
-                             "kernels impl.")
+                             " Absolute path to a shared library with the"
+                             " kernels impl.")
     parser.add_argument("-d", "--device", type=str, required=False, default="CPU",
                         help="Specify the target device to infer on: "
                              "CPU, GPU, FPGA or MYRIAD is acceptable. The program "
                              "will look for a suitable plugin for the device "
                              "specified (CPU by default)")
     parser.add_argument("-ct", "--conf_threshold", type=float, default=0.3, required=False,
-                        help="Probability threshold for detections filtering"
+                        help="Confidence threshold for detections filtering"
                         " (0.3 by default)")
     parser.add_argument("-bm", "--benchmark", required=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'],
                     default=True, help="Show benchmark data? True|False (True by default)")
@@ -103,7 +103,7 @@ def build_argparser():
     parser.add_argument("-sv", "--showvideo", required=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'],
                     default=True, help="Show video while running? True|False. (True by default)")
     parser.add_argument("-async", "--async_inference", required=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'],
-                    default=True, help="If True, run asynchronous inference where possible."
+                    default=True, help="If True, run asynchronous inference where possible. "
                                         "If false, run synchronous inference. True|False. (True by default)")
 
     return parser
@@ -260,7 +260,7 @@ def infer_on_stream(args):
             total_df.loc(axis=0)[fl_infer_network.short_name,precision]['load'] = fl_infer_network.load_model(dir=fl_dir, name=fl_model)
             total_df.loc(axis=0)[hp_infer_network.short_name,precision]['load'] = hp_infer_network.load_model(dir=hp_dir, name=hp_model)
             total_df.loc(axis=0)[ge_infer_network.short_name,precision]['load'] = ge_infer_network.load_model(dir=ge_dir, name=ge_model)
-
+            
             too_many = False
             not_enough = False
             single = False

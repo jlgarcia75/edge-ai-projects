@@ -23,16 +23,16 @@ class ModelBase:
 
     def load_model(self, dir, name):
         '''
-        TODO: This method needs to be completed by you
         Returns: Time to load model
         '''
         self.model_structure=os.path.join(dir, name+".xml")
         self.model_weights=os.path.join(dir, name+".bin")
+        print(f"Loading {self.model_structure}...")
 
         try:
             self.model=IENetwork(self.model_structure, self.model_weights)
         except Exception as e:
-            raise ValueError("Could not Initialise the network. Have you entered the correct model path? {}".format(e))
+            raise ValueError("Could not initialize the network. Have you entered the correct model path? {}".format(e))
 
         self.input_name=next(iter(self.model.inputs))
         self.input_shape=self.model.inputs[self.input_name].shape
@@ -52,12 +52,10 @@ class ModelBase:
 
     def predict(self, image):
         '''
-        TODO: This method needs to be completed by you
-        Returns: Duration of inference time, new image with detections
+        Returns: None
         '''
         #Run Inference
         self.exec_net.start_async(request_id=0,inputs={self.input_name:image})
-        return
 
     def wait(self):
     ### Wait for the request to be complete. ###
@@ -86,7 +84,7 @@ class ModelBase:
         unsupported_layers = [l for l in self.model.layers.keys() if l not in supported_layers]
         if len(unsupported_layers) != 0:
             print("The following layers are not supported by the plugin for specified device {}:\n {}".format(self.device, ', '.join(unsupported_layers)))
-            print(f"Please try to specify {self.device} extensions library path in sample's command line parameters using -l or --extension command line argument.")
+            print(f"Please try to specify {self.device} extensions library path in the command line parameters using -l or --extension command line argument.")
             sys.exit(1)
 
 
@@ -105,8 +103,7 @@ class ModelBase:
 
     def preprocess_output(self):
         '''
-        TODO: This method needs to be completed by you
-        Creates array of box coordinates from outputs
+        Returns: outputs
 
         '''
         #Get the outputs
