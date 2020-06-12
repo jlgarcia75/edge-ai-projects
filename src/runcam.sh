@@ -8,6 +8,7 @@ python main.py -i 0 \
 	-gem ../models/intel/gaze-estimation-adas-0002 \
 	-d ${DEVICE} \
 	-ct 0.3 \
-	-bm False \
-	-sv True \
-	-p ${PRECISION}
+	-bm True \
+	-v True \
+	-p ${PRECISION} \
+	-nf 10

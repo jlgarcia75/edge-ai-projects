@@ -16,17 +16,32 @@ The mouse controller is hardcoded for fast, high-precision movement but you will
 
 The video and detections from model outputs are shown by default but they can be turned off using command line arguments.
 
+
+
 ## Project Set Up and Installation
+The program works on Linux, MacOS, and Windows. The instructions below are written for Linux 
+
 ### Prerequisites
 * Intel® OpenVINO™ Toolkit 2019.R3 or above
 * pandas
 * numpy
 * cv2 (comes with OpenVINO)
+* pyautogui
+* glob
+* math
+
+
 
 ### Setup
-1.  Clone this git into your working directory.
-2.  Source the OpenVINO environment.
+```
+#Clone this git into your working directory.
+$ git clone https://github.com/jlgarcia75/move-mouse-pointer.git```
 
+# Install prerequisites
+$ python -m pip install prerequisites.txt```
+$ cd move-mouse-pointer/src
+$ python main.py -i ../bin/demo.mp4
+```
 ### Directory structure
 ```
 <download dir>
@@ -34,7 +49,6 @@ The video and detections from model outputs are shown by default but they can be
   bin/demo.mp4 <video file>
   models/intel/<model name>/<precision>/<modelname .bin and .xml>
   ```
-
   ## Demo
   Several scripts for both Linux/MacOS (.sh files) and Windows (.bat files) are provided that will run the project with common configurations.
 
@@ -280,3 +294,6 @@ The program has several cool controls from the command line.
 * Use `-bm True` to display performance data. True is default. Use `-bm False` if you don't want to see the peformance data.
 * Use `-async True|False` to run the Landmark and Head Pose models with or without asynchronous inferencing.
 * Use `-i INPUT` to specify either a video file, an image, your webcam with `-i 0`, or a directory of images by specifying the directory name.
+
+# Attributions
+The code to draw the head pose and gaze axes come from an answer in this ![post](https://knowledge.udacity.com/questions/171017) by

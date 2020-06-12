@@ -127,6 +127,8 @@ def scale_dims(shape, x, y):
 
     return x, y
 
+#build_camera_matrix and draw_axes code from https://knowledge.udacity.com/questions/171017, thanks to Mentor Shibin M
+
 def build_camera_matrix(center_of_face, focal_length):
     cx = int(center_of_face[0])
     cy = int(center_of_face[1])
@@ -302,13 +304,15 @@ def infer_on_stream(args):
 
         mc = MouseController('high', 'fast')
         screenWidth, screenHeight = mc.monitor()
-        print(f"screen {screenWidth} {screenHeight}")
-        print(f"frame {frame_width} {frame_height}")
+
         if args.showvideo:
             cv2.startWindowThread()
             cv2.namedWindow("Out")
-            cv2.moveWindow("Out", int((screenWidth-frame_width)/2), int((screenHeight-frame_height)/2))
-            print(f"Window coords {int((screenWidth-frame_width)/2)} {int((screenHeight-frame_height)/2)}")
+            if platform == "win32":
+                cv2.moveWindow("Out", int((screenWidth-frame_width)/2), int((screenHeight-frame_height)/2))
+            else:
+                cv2.moveWindow("Out", int((screenWidth-frame_width)/2), int((screenHeight+frame_height)/2))
+
 
         # Process frames until the video ends, or process is exited
         ### TODO: Load the models through `infer_network` ###
@@ -436,7 +440,7 @@ def infer_on_stream(args):
                         frame = draw_axes(frame, scaled_lm[1], gaze[0][0], gaze[0][1], gaze[0][2], scale, focal_length)
 
                     #Move the mouse cursor
-                   mc.move(gaze[0][0], gaze[0][1])
+                    mc.move(gaze[0][0], gaze[0][1])
 
                 elif num_detections > 1:
                     single = False
@@ -452,7 +456,7 @@ def infer_on_stream(args):
                         text="Is there anybody out there?"
                         print(text)
                         not_enough=True
-                if args.showvideo or args.visualization: cv2.imshow("Out", frame)
+                if args.showvideo or args.visualize: cv2.imshow("Out", frame)
             ## End While Loop
             runtime[precision] = time.perf_counter() - runtime_start
             # Release the capture and destroy any OpenCV windows
