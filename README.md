@@ -28,7 +28,6 @@ The program works on Linux, MacOS, and Windows. The instructions below are writt
 * numpy
 * cv2 (comes with OpenVINO)
 * pyautogui
-* glob
 
 
 ### Setup
