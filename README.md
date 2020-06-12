@@ -3,7 +3,7 @@ layout: post
 title: README.md
 date: '2020-06-10 19:04'
 tags:
-  - mouse da
+  - openvino
 ---
 
 # Computer Pointer Controller
@@ -19,58 +19,55 @@ The video and detections from model outputs are shown by default but they can be
 
 
 ## Project Set Up and Installation
-The program works on Linux, MacOS, and Windows. The instructions below are written for Linux 
+The program works on Linux, MacOS, and Windows. The instructions below are written for Linux but can be easily adapted to Windows.
 
 ### Prerequisites
 * Intel® OpenVINO™ Toolkit 2019.R3 or above
+* python 3.7
 * pandas
 * numpy
 * cv2 (comes with OpenVINO)
 * pyautogui
 * glob
-* math
-
 
 
 ### Setup
 ```
 #Clone this git into your working directory.
-$ git clone https://github.com/jlgarcia75/move-mouse-pointer.git```
-
+$ git clone https://github.com/jlgarcia75/move-mouse-pointer.git
+$ cd move-mouse-pointer
 # Install prerequisites
-$ python -m pip install prerequisites.txt```
-$ cd move-mouse-pointer/src
-$ python main.py -i ../bin/demo.mp4
+$ python -m pip install prerequisites.txt
 ```
 ### Directory structure
 ```
-<download dir>
+move-mouse-pointer/
   src/<source files>
-  bin/demo.mp4 <video file>
+  bin/<video file>
   models/intel/<model name>/<precision>/<modelname .bin and .xml>
   ```
-  ## Demo
-  Several scripts for both Linux/MacOS (.sh files) and Windows (.bat files) are provided that will run the project with common configurations.
+## Demo
+Several scripts for both Linux/MacOS (.sh files) and Windows (.bat files) are provided that will run the project with common configurations.
 
-  Take a look at
-  ```
-  rundemo.sh
-  runcam.sh
-  ```
-  and their equivalent files for Windows with ```.bat``` extensions.
+Take a look at
+```
+rundemo.sh
+runcam.sh
+```
+and their equivalent files for Windows with ```.bat``` extensions.
 
-  The only required argument is the ```-i``` argument to specify the input. All other arguments are optional and have default values. For an easy run with an input video:
+The only required argument is the ```-i``` argument to specify the input. All other arguments are optional and have default values. For an easy run with an input video:
 
-  ```
-  $ source /opt/intel/openvino/bin/setupvars.sh
-  $ cd src
-  $ python main.py -i ../bin/demo.mp4
-  ```
+```
+$ source /opt/intel/openvino/bin/setupvars.sh
+$ cd move-mouse-pointer/src
+# Run program
+$ python main.py -i ../bin/demo.mp4
+```
+This will run the program on ![demo.mp4](./bin/demo.mp4) for 100 frames. To run the whole video, specify ```-nf 600``` or higher.
 
-  This will run the program on ![demo.mp4](./bin/demo.mp4) for 100 frames. To run the whole video, specify ```-nf 600``` or higher.
-
-  To run the camera with webcam input:
-  ```$ python main.py -i 0```
+To run the camera with webcam input:
+```$ python main.py -i 0```
 
 ### Model Inputs
 When specifying the model directories with the -flm, -hpm, and -gem flags you must provide a directory path that ends with the model name just above the <precision>. When you specify the precision you want to load using the -p flag, the precision will be concatenated to the model path to get to the model files.
@@ -296,4 +293,4 @@ The program has several cool controls from the command line.
 * Use `-i INPUT` to specify either a video file, an image, your webcam with `-i 0`, or a directory of images by specifying the directory name.
 
 # Attributions
-The code to draw the head pose and gaze axes come from an answer in this ![post](https://knowledge.udacity.com/questions/171017) by
+The code to draw the head pose and gaze axes come from an answer in this ![post](https://knowledge.udacity.com/questions/171017) by awesome Udacity mentor Shibin M.
