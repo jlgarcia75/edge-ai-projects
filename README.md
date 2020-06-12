@@ -161,9 +161,9 @@ optional arguments:
                         by default)
 ```
 ## Benchmarks
-Please see ![gaze results](./src/gaze_results_2020_06_10_6.47.txt) for detailed benchmark data.
+Please see ![gaze results](./src/gaze_benchmark_2020_06_10_6.47.txt) for detailed benchmark data.
 
-The script that runs the benchmarks on Windows is ![runbenchmarks.bat](./src/runbenchmarks.bat).
+The script that runs the benchmarks on Windows is ![runbenchmarks.bat](./src/runbenchmark.bat).
 
 
 ## Results
@@ -286,7 +286,7 @@ The program has several cool controls from the command line.
 * Use `-p <list of precisions>` to specify several precisions to execute sequentially within the same run. The input video starts at frame 0 at the beginning of a new precision run. Try it yourself with `-p FP32,FP16`.
 * Use `-sv False` to not show the video during the run. This way, you will see the mouse moving on the screen without seeing the video itself.
 * Use `-v True`, which is default, to view cool model outputs. This will show you face detection, landmarks, head pose, and gaze.
-![detections.png](./src/detections.png)
+![detections.png](./src/detections.PNG)
 * Use `-bm True` to display performance data. True is default. Use `-bm False` if you don't want to see the peformance data.
 * Use `-async True|False` to run the Landmark and Head Pose models with or without asynchronous inferencing.
 * Use `-i INPUT` to specify either a video file, an image, your webcam with `-i 0`, or a directory of images by specifying the directory name.
