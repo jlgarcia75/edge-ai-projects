@@ -108,7 +108,7 @@ def build_argparser():
                                         "If false, run synchronous inference. True|False. (True by default)")
     parser.add_argument("-v", "--visualize", required=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'],
                     default=True, help="If True, visualize the outputs from each model. "
-                    "If -v is True then the video will be shown regardless of -bm."
+                    "If -v is True then the video will be shown regardless of -sv. "
                     "If false, do not show outputs. True|False. (True by default)")
     return parser
 
@@ -188,7 +188,7 @@ def draw_axes(frame, center_of_face, yaw, pitch, roll, scale, focal_length):
     return frame
 
 #scale the landmarks to the whole frame size
-def scale_landmarks(landmarks, image_shape, orig, image):
+def scale_landmarks(landmarks, image_shape, orig, image, draw):
     color = (0,0,255) #RED
     thickness = cv2.FILLED
     num_lm = len(landmarks)
@@ -199,7 +199,7 @@ def scale_landmarks(landmarks, image_shape, orig, image):
         x, y = scale_dims(image_shape, landmarks[point], landmarks[point+1])
         x_scaled = orig_x + x
         y_scaled = orig_y + y
-        if args.visualize:
+        if draw:
             image = cv2.circle(image, (x_scaled, y_scaled), 2, color, thickness)
         scaled_landmarks.append([x_scaled, y_scaled])
 
@@ -401,7 +401,7 @@ def infer_on_stream(args):
                         if fl_infer_network.wait()==0:
                             start_time = time.perf_counter()
                             outputs = fl_infer_network.preprocess_output()
-                            scaled_lm, frame = scale_landmarks(landmarks=outputs[fl_infer_network.output_name][0], image_shape=face_frame.shape, orig=(x_min, y_min),image=frame)
+                            scaled_lm, frame = scale_landmarks(landmarks=outputs[fl_infer_network.output_name][0], image_shape=face_frame.shape, orig=(x_min, y_min),image=frame,draw=args.visualize)
                             total_df.loc(axis=0)[fl_infer_network.short_name,precision]['output']  += time.perf_counter() - start_time
 
                         if hp_infer_network.wait()==0:
@@ -413,7 +413,7 @@ def infer_on_stream(args):
                     else: #Run synchronous inference
                         #facial landmark detection preprocess the input
                         total_df.loc(axis=0)[fl_infer_network.short_name,precision], outputs = run_pipeline(fl_infer_network, face_frame, total_df.loc(axis=0)[fl_infer_network.short_name,precision])
-                        scaled_lm, frame = scale_landmarks(landmarks=outputs[fl_infer_network.output_name][0], image_shape=face_frame.shape, orig=(x_min, y_min),image=frame)
+                        scaled_lm, frame = scale_landmarks(landmarks=outputs[fl_infer_network.output_name][0], image_shape=face_frame.shape, orig=(x_min, y_min),image=frame,draw=args.visualize)
                         #Send cropped frame to head pose estimation
                         total_df.loc(axis=0)[hp_infer_network.short_name, precision], outputs = run_pipeline(hp_infer_network, face_frame, total_df.loc(axis=0)[hp_infer_network.short_name,precision])
                         hp_angles = [outputs['angle_y_fc'][0], outputs['angle_p_fc'][0], outputs['angle_r_fc'][0]]
@@ -436,7 +436,7 @@ def infer_on_stream(args):
                         frame = draw_axes(frame, scaled_lm[1], gaze[0][0], gaze[0][1], gaze[0][2], scale, focal_length)
 
                     #Move the mouse cursor
-                    mc.move(gaze[0][0], gaze[0][1])
+                #    mc.move(gaze[0][0], gaze[0][1])
 
                 elif num_detections > 1:
                     single = False

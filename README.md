@@ -14,6 +14,8 @@ When the program starts, a window showing the input video appears in the middle 
 
 The mouse controller is hardcoded for fast, high-precision movement but you will still see it moving very slowly.
 
+The video and detections from model outputs are shown by default but they can be turned off using command line arguments.
+
 ## Project Set Up and Installation
 ### Prerequisites
 * Intel® OpenVINO™ Toolkit 2019.R3 or above
@@ -142,6 +144,11 @@ optional arguments:
                         If True, run asynchronous inference where possible. If
                         false, run synchronous inference. True|False. (True by
                         default)
+   -v VISUALIZE, --visualize VISUALIZE
+                        If True, visualize the outputs from each model. If -v
+                        is True then the video will be shown regardless of
+                        -sv. If false, do not show outputs. True|False. (True
+                        by default)
 ```
 ## Benchmarks
 Please see ![gaze results](./gaze_results_2020_06_10_6.47.txt) for detailed benchmark data.
@@ -268,6 +275,8 @@ The program has several cool controls from the command line.
 * Use the `-nf num_frames` to control the number of frames to process from both video and camera inputs. Example, `-nf 100` runs the program for 100 frames, then exits.
 * Use `-p <list of precisions>` to specify several precisions to execute sequentially within the same run. The input video starts at frame 0 at the beginning of a new precision run. Try it yourself with `-p FP32,FP16`.
 * Use `-sv False` to not show the video during the run. This way, you will see the mouse moving on the screen without seeing the video itself.
+* Use `-v True`, which is default, to view cool model outputs. This will show you face detection, landmarks, head pose, and gaze.
+![detections.png](./src/detections.png)
 * Use `-bm True` to display performance data. True is default. Use `-bm False` if you don't want to see the peformance data.
 * Use `-async True|False` to run the Landmark and Head Pose models with or without asynchronous inferencing.
 * Use `-i INPUT` to specify either a video file, an image, your webcam with `-i 0`, or a directory of images by specifying the directory name.
