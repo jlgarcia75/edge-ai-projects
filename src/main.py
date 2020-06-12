@@ -32,6 +32,7 @@ from signal import SIGINT, signal
 from argparse import ArgumentParser
 from sys import platform
 import os
+import math
 
 
 
@@ -126,6 +127,66 @@ def scale_dims(shape, x, y):
 
     return x, y
 
+def build_camera_matrix(center_of_face, focal_length):
+    cx = int(center_of_face[0])
+    cy = int(center_of_face[1])
+    camera_matrix = np.zeros((3, 3), dtype='float32')
+    camera_matrix[0][0] = focal_length
+    camera_matrix[0][2] = cx
+    camera_matrix[1][1] = focal_length
+    camera_matrix[1][2] = cy
+    camera_matrix[2][2] = 1
+    return camera_matrix
+
+def draw_axes(frame, center_of_face, yaw, pitch, roll, scale, focal_length):
+    yaw *= np.pi / 180.0
+    pitch *= np.pi / 180.0
+    roll *= np.pi / 180.0
+    cx = int(center_of_face[0])
+    cy = int(center_of_face[1])
+    Rx = np.array([[1, 0, 0],
+                   [0, math.cos(pitch), -math.sin(pitch)],
+                   [0, math.sin(pitch), math.cos(pitch)]])
+    Ry = np.array([[math.cos(yaw), 0, -math.sin(yaw)],
+                   [0, 1, 0],
+                   [math.sin(yaw), 0, math.cos(yaw)]])
+    Rz = np.array([[math.cos(roll), -math.sin(roll), 0],
+                   [math.sin(roll), math.cos(roll), 0],
+                   [0, 0, 1]])
+    # R = np.dot(Rz, Ry, Rx)
+    # ref: https://www.learnopencv.com/rotation-matrix-to-euler-angles/
+    # R = np.dot(Rz, np.dot(Ry, Rx))
+    R = Rz @ Ry @ Rx
+    # print(R)
+    camera_matrix = build_camera_matrix(center_of_face, focal_length)
+    xaxis = np.array(([1 * scale, 0, 0]), dtype='float32').reshape(3, 1)
+    yaxis = np.array(([0, -1 * scale, 0]), dtype='float32').reshape(3, 1)
+    zaxis = np.array(([0, 0, -1 * scale]), dtype='float32').reshape(3, 1)
+    zaxis1 = np.array(([0, 0, 1 * scale]), dtype='float32').reshape(3, 1)
+    o = np.array(([0, 0, 0]), dtype='float32').reshape(3, 1)
+    o[2] = camera_matrix[0][0]
+    xaxis = np.dot(R, xaxis) + o
+    yaxis = np.dot(R, yaxis) + o
+    zaxis = np.dot(R, zaxis) + o
+    zaxis1 = np.dot(R, zaxis1) + o
+    xp2 = (xaxis[0] / xaxis[2] * camera_matrix[0][0]) + cx
+    yp2 = (xaxis[1] / xaxis[2] * camera_matrix[1][1]) + cy
+    p2 = (int(xp2), int(yp2))
+    cv2.line(frame, (cx, cy), p2, (0, 0, 255), 2)
+    xp2 = (yaxis[0] / yaxis[2] * camera_matrix[0][0]) + cx
+    yp2 = (yaxis[1] / yaxis[2] * camera_matrix[1][1]) + cy
+    p2 = (int(xp2), int(yp2))
+    cv2.line(frame, (cx, cy), p2, (0, 255, 0), 2)
+    xp1 = (zaxis1[0] / zaxis1[2] * camera_matrix[0][0]) + cx
+    yp1 = (zaxis1[1] / zaxis1[2] * camera_matrix[1][1]) + cy
+    p1 = (int(xp1), int(yp1))
+    xp2 = (zaxis[0] / zaxis[2] * camera_matrix[0][0]) + cx
+    yp2 = (zaxis[1] / zaxis[2] * camera_matrix[1][1]) + cy
+    p2 = (int(xp2), int(yp2))
+    cv2.line(frame, p1, p2, (255, 0, 0), 2)
+    cv2.circle(frame, p2, 3, (255, 0, 0), 2)
+    return frame
+
 #scale the landmarks to the whole frame size
 def scale_landmarks(landmarks, image_shape, orig, image):
     color = (0,0,255) #RED
@@ -138,7 +199,8 @@ def scale_landmarks(landmarks, image_shape, orig, image):
         x, y = scale_dims(image_shape, landmarks[point], landmarks[point+1])
         x_scaled = orig_x + x
         y_scaled = orig_y + y
-        image = cv2.circle(image, (x_scaled, y_scaled), 2, color, thickness)
+        if args.visualize:
+            image = cv2.circle(image, (x_scaled, y_scaled), 2, color, thickness)
         scaled_landmarks.append([x_scaled, y_scaled])
 
     return scaled_landmarks, image
@@ -240,16 +302,23 @@ def infer_on_stream(args):
 
         mc = MouseController('high', 'fast')
         screenWidth, screenHeight = mc.monitor()
+        print(f"screen {screenWidth} {screenHeight}")
+        print(f"frame {frame_width} {frame_height}")
         if args.showvideo:
             cv2.startWindowThread()
             cv2.namedWindow("Out")
-            cv2.moveWindow("Out", int((screenWidth-frame_width)/2), int((screenHeight+frame_height)/2))
+            cv2.moveWindow("Out", int((screenWidth-frame_width)/2), int((screenHeight-frame_height)/2))
+            print(f"Window coords {int((screenWidth-frame_width)/2)} {int((screenHeight-frame_height)/2)}")
 
         # Process frames until the video ends, or process is exited
         ### TODO: Load the models through `infer_network` ###
         print("Video being shown: ", str(args.showvideo))
         #Dictionary to store runtimes for each precision
         runtime={}
+
+        #Camera parameters for drawing pose axes
+        focal_length = 950.0
+        scale = 50
         for precision in precisions:
             print("Beginning test for precision {}.".format(precision))
             mc.put(int(screenWidth/2), int(screenHeight/2)) #Place the mouse cursor in the center of the screen
@@ -306,15 +375,14 @@ def infer_on_stream(args):
                         single=True
 
                     x_min, y_min, x_max, y_max = coords[0]
-                    orig_x, orig_y = scale_dims(frame.shape, x_min, y_min)
+                    x_min, y_min = scale_dims(frame.shape, x_min, y_min)
                     x_max, y_max = scale_dims(frame.shape, x_max, y_max)
-                    frame = draw_box(frame,(orig_x, orig_y), (x_max, y_max))
-                    cropped_frame = frame[orig_y:y_max, orig_x:x_max]
+                    face_frame = frame[y_min:y_max, x_min:x_max]
 
                     if args.async_inference: #Run asynchronous inference
                     #facial landmark detection preprocess the input
                         start_time = time.perf_counter()
-                        frame_for_input = fl_infer_network.preprocess_input(cropped_frame)
+                        frame_for_input = fl_infer_network.preprocess_input(face_frame)
                         total_df.loc(axis=0)[fl_infer_network.short_name,precision]['input']  += time.perf_counter() - start_time
 
                         #Run landmarks inference asynchronously
@@ -323,7 +391,7 @@ def infer_on_stream(args):
 
                         #Send cropped frame to head pose estimation
                         start_time = time.perf_counter()
-                        frame_for_input = hp_infer_network.preprocess_input(cropped_frame)
+                        frame_for_input = hp_infer_network.preprocess_input(face_frame)
                         total_df.loc(axis=0)[hp_infer_network.short_name,precision]['input']  += time.perf_counter() - start_time
 
                         #Head pose infer
@@ -333,7 +401,7 @@ def infer_on_stream(args):
                         if fl_infer_network.wait()==0:
                             start_time = time.perf_counter()
                             outputs = fl_infer_network.preprocess_output()
-                            scaled_lm, frame = scale_landmarks(landmarks=outputs[fl_infer_network.output_name][0], image_shape=cropped_frame.shape, orig=(orig_x, orig_y),image= frame)
+                            scaled_lm, frame = scale_landmarks(landmarks=outputs[fl_infer_network.output_name][0], image_shape=face_frame.shape, orig=(x_min, y_min),image=frame)
                             total_df.loc(axis=0)[fl_infer_network.short_name,precision]['output']  += time.perf_counter() - start_time
 
                         if hp_infer_network.wait()==0:
@@ -341,18 +409,32 @@ def infer_on_stream(args):
                             outputs = hp_infer_network.preprocess_output()
                             hp_angles = [outputs['angle_y_fc'][0], outputs['angle_p_fc'][0], outputs['angle_r_fc'][0]]
                             total_df.loc(axis=0)[hp_infer_network.short_name,precision]['output'] += time.perf_counter() - start_time
+
                     else: #Run synchronous inference
                         #facial landmark detection preprocess the input
-                        total_df.loc(axis=0)[fl_infer_network.short_name,precision], outputs = run_pipeline(fl_infer_network, cropped_frame, total_df.loc(axis=0)[fl_infer_network.short_name,precision])
-                        scaled_lm = scale_landmarks(landmarks=outputs[fl_infer_network.output_name][0], image_shape=cropped_frame.shape, orig=(orig_x, orig_y))
+                        total_df.loc(axis=0)[fl_infer_network.short_name,precision], outputs = run_pipeline(fl_infer_network, face_frame, total_df.loc(axis=0)[fl_infer_network.short_name,precision])
+                        scaled_lm, frame = scale_landmarks(landmarks=outputs[fl_infer_network.output_name][0], image_shape=face_frame.shape, orig=(x_min, y_min),image=frame)
                         #Send cropped frame to head pose estimation
-                        total_df.loc(axis=0)[hp_infer_network.short_name, precision], outputs = run_pipeline(hp_infer_network, cropped_frame, total_df.loc(axis=0)[hp_infer_network.short_name,precision])
+                        total_df.loc(axis=0)[hp_infer_network.short_name, precision], outputs = run_pipeline(hp_infer_network, face_frame, total_df.loc(axis=0)[hp_infer_network.short_name,precision])
                         hp_angles = [outputs['angle_y_fc'][0], outputs['angle_p_fc'][0], outputs['angle_r_fc'][0]]
+
 
                     input_duration, predict_duration, output_duration, gaze = ge_infer_network.sync_infer(face_image=frame, landmarks=scaled_lm, head_pose_angles=[hp_angles])
                     total_df.loc(axis=0)[ge_infer_network.short_name,precision]['input'] += input_duration
                     total_df.loc(axis=0)[ge_infer_network.short_name,precision]['infer'] += predict_duration
                     total_df.loc(axis=0)[ge_infer_network.short_name,precision]['output'] += output_duration
+
+                    if args.visualize:
+                        #draw box around detected face
+                        frame = draw_box(frame,(x_min, y_min), (x_max, y_max))
+                        center_of_face = (x_min + face_frame.shape[1] / 2, y_min + face_frame.shape[0] / 2, 0)
+                        #draw head pose axes
+                        frame = draw_axes(frame, center_of_face, hp_angles[0], hp_angles[1], hp_angles[2], scale, focal_length)
+                        #left eye gaze
+                        frame = draw_axes(frame, scaled_lm[0], gaze[0][0], gaze[0][1], gaze[0][2], scale, focal_length)
+                        #draw gaze vectors on right eye
+                        frame = draw_axes(frame, scaled_lm[1], gaze[0][0], gaze[0][1], gaze[0][2], scale, focal_length)
+
                     #Move the mouse cursor
                     mc.move(gaze[0][0], gaze[0][1])
 
