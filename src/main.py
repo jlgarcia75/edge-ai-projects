@@ -436,7 +436,7 @@ def infer_on_stream(args):
                         frame = draw_axes(frame, scaled_lm[1], gaze[0][0], gaze[0][1], gaze[0][2], scale, focal_length)
 
                     #Move the mouse cursor
-                #    mc.move(gaze[0][0], gaze[0][1])
+                   mc.move(gaze[0][0], gaze[0][1])
 
                 elif num_detections > 1:
                     single = False
