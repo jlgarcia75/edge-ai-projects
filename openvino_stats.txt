@@ -1,0 +1,16 @@
+OpenVINO Results
+
+Current date and time:
+2020-06-23 21:31:47
+Platform: darwin
+Device: CPU
+Model : ./models/intel/ssd_mobilenet_v2_coco/ssd_mobilenet_v2_coco_2018_03_29/frozen_inference_graph.xml
+Probably Threshold: 0.3
+Accuracy: 93.61549497847919%
+Load Model Time: 327.62 ms
+Total Inference Time: 37164.36 ms
+Average Inference Time: 26.66 ms
+
+*********************************************************************************
+
+
