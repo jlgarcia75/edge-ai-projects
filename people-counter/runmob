@@ -1,0 +1,2 @@
+source /opt/intel/openvino/bin/setupvars.sh -pyver 3.7
+python3 people-counter-local.py -i ./resources/Pedestrian_Detect_2_1_1.mp4 -m ../models/intel/ssd_mobilenet_v2_coco/ssd_mobilenet_v2_coco_2018_03_29/frozen_inference_graph.xml -pt 0.3

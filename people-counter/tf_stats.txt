@@ -1,0 +1,38 @@
+TensorFlow Results
+Model : ssd_mobilenet_v2_coco_2018_03_29
+Current date and time : 2020-05-16 21:00:34
+Accuracy: 84003.01291248207%
+Load Model Time: 1516.08 ms
+Total Inference Time: 197684.64 ms
+Average Inference Time: 141.81 ms
+
+
+*********************************************************************************
+
+
+TensorFlow Results
+Model : ssd_mobilenet_v2_coco_2018_03_29
+Current date and time : 
+2020-05-16 21:10:08
+Accuracy: 94.33285509325682%
+Load Model Time: 1514.66 ms
+Total Inference Time: 203760.45 ms
+Average Inference Time: 146.17 ms
+
+
+*********************************************************************************
+
+
+TensorFlow Results
+Model : ssd_mobilenet_v2_coco_2018_03_29
+Current date and time : 
+2020-05-16 22:51:26
+Accuracy: 94.33285509325682%
+Load Model Time: 1750.77 ms
+Total Inference Time: 203388.17 ms
+Average Inference Time: 145.90 ms
+
+
+*********************************************************************************
+
+

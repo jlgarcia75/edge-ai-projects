@@ -1,0 +1,1 @@
+python main_local.py -i Pedestrian_Detect_2_1_1.mp4 -m .\ssd_mobilenet_v2_coco_2018_03_29\frozen_inference_graph.xml -d MYRIAD -pt 0.3
